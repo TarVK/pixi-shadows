@@ -1,0 +1,38 @@
+{
+  "name": "pixi-shadows",
+  "version": "0.0.1",
+  "description": "A plugin for PixiJS V4 that allows you to add dymanic shadows to your stage",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "webpack-dev-server --open",
+    "watch": "npx babel src/ --watch --out-dir dist/ --source-maps",
+    "build": "npx webpack",
+    "build:babel": "npx babel src/ --out-dir dist/ --source-maps"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TarVK/pixi-shadows.git"
+  },
+  "author": "Tar van Krieken",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TarVK/pixi-shadows/issues"
+  },
+  "homepage": "https://github.com/TarVK/pixi-shadows",
+  "dependencies": {
+    "pixi-layers": "^0.1.9",
+    "pixi-lights": "^2.0.1",
+    "pixi.js": "^4.8.1",
+    "stats-js": "^1.0.0-alpha1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-loader": "^7.1.5",
+    "babel-preset-env": "^1.7.0",
+    "concurrently": "^3.6.1",
+    "webpack": "^4.16.2",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.5",
+    "webpack-serve": "^2.0.2"
+  }
+}
