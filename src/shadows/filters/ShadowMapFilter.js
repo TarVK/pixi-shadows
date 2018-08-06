@@ -22,13 +22,13 @@ export default class ShadowMapFilter extends PIXI.Filter{
             varying vec2 vTextureCoord;
             uniform vec4 filterArea;
             
-            uniform sampler2D objectSampler;
-            uniform vec2 objectSpriteDimensions;
+            uniform sampler2D shadowCasterSampler;
+            uniform vec2 shadowCasterSpriteDimensions;
 
-            uniform bool hasIgnoreObject;
-            uniform sampler2D ignoreObjectSampler;
-            uniform mat3 ignoreObjectMatrix;
-            uniform vec2 ignoreObjectDimensions;
+            uniform bool hasIgnoreShadowCaster;
+            uniform sampler2D ignoreShadowCasterSampler;
+            uniform mat3 ignoreShadowCasterMatrix;
+            uniform vec2 ignoreShadowCasterDimensions;
 
             uniform float lightRange;
             uniform float lightScatterRange;
@@ -73,13 +73,13 @@ export default class ShadowMapFilter extends PIXI.Filter{
                     vec2 coord = lightLoc + offset + vec2(cos(angle), sin(angle)) * distance;
                 
                     // Extract the pixel and check if it is opaque
-                    float opacity = texture2D(objectSampler, coord / objectSpriteDimensions).a;
-                    if(opacity > 0.95){
+                    float opacity = texture2D(shadowCasterSampler, coord / shadowCasterSpriteDimensions).a;
+                    if(opacity > 0.5){
                         // Check if it isn't hitting something that should be ignore
-                        if(hasIgnoreObject){ 
-                            vec2 l = (ignoreObjectMatrix * vec3(coord, 1.0)).xy / ignoreObjectDimensions;
+                        if(hasIgnoreShadowCaster){ 
+                            vec2 l = (ignoreShadowCasterMatrix * vec3(coord, 1.0)).xy / ignoreShadowCasterDimensions;
                             if(l.x >= -0.01 && l.x <= 1.01 && l.y >= -0.01 && l.y <= 1.01){
-                                // If the pixel at the ignoreObject is opaque here, skip this pixel
+                                // If the pixel at the ignoreShadowCaster is opaque here, skip this pixel
                                 if(opacity > 0.5){
                                     continue;
                                 }
@@ -105,14 +105,14 @@ export default class ShadowMapFilter extends PIXI.Filter{
         this.autoFit = false;
         this.padding = 0;
 
-        this.ignoreObjectMatrix = new PIXI.Matrix();
+        this.ignoreShadowCasterMatrix = new PIXI.Matrix();
     }
     
     apply(filterManager, input, output){
         // Attach the object sampler
-        var os = this.shadow._objectSprite;
-        this.uniforms.objectSpriteDimensions = [os.width, os.height];
-        this.uniforms.objectSampler = os._texture;
+        var sc = this.shadow._shadowCasterSprite;
+        this.uniforms.shadowCasterSpriteDimensions = [sc.width, sc.height];
+        this.uniforms.shadowCasterSampler = sc._texture;
 
         // Use the world transform (data about the absolute location on the screen) to determine the lights relation to the objectSampler
         var wt = this.shadow.worldTransform;
@@ -124,16 +124,16 @@ export default class ShadowMapFilter extends PIXI.Filter{
         this.uniforms.depthResolution = range * this.shadow.depthResolution;
 
         // Check if there is an object that the filter should attempt to ignore
-        var io = this.shadow.ignoreObject;
-        this.uniforms.hasIgnoreObject = !!io;
-        if(io){
+        var isc = this.shadow.ignoreShadowCaster;
+        this.uniforms.hasIgnoreShadowCaster = !!isc;
+        if(isc){
             // Calculate the tranform matrix in order to access the proper pixel of the ignoreObject
-            io.worldTransform.copy(this.ignoreObjectMatrix);
-            this.uniforms.ignoreObjectMatrix = this.ignoreObjectMatrix.invert();
+            isc.worldTransform.copy(this.ignoreShadowCasterMatrix);
+            this.uniforms.ignoreShadowCasterMatrix = this.ignoreShadowCasterMatrix.invert();
 
             // Attach the ignore object
-            this.uniforms.ignoreObjectDimensions = [io.width, io.height];
-            this.uniforms.ignoreObjectSampler = io._texture;
+            this.uniforms.ignoreShadowCasterDimensions = [isc.width, isc.height];
+            this.uniforms.ignoreShadowCasterSampler = isc._texture;
         }
 
         // Apply the filter

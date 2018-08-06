@@ -11,25 +11,31 @@ import Shadow from './Shadow';
 
 PIXI.shadows = {
     init: function(application){
-        this.objectGroup = new PIXI.display.Group();
-        this.objectLayer = new PIXI.display.Layer(this.objectGroup);
+        // The objects that will cast shadows
+        this.shadowCasterGroup = new PIXI.display.Group();
+        this.shadowCasterLayer = new PIXI.display.Layer(this.shadowCasterGroup);
 
-        // Make sure the collider objects aren't actually visible
-        this.objectLayer.renderWebGL = function(){}; 
+        // The objects that will remain ontop of the shadows
+        this.shadowOverlayGroup = new PIXI.display.Group();
+        this.shadowOverlayLayer = new PIXI.display.Layer(this.shadowOverlayGroup);
+
+        // Make sure the caster objects aren't actually visible
+        this.shadowCasterLayer.renderWebGL = function(){}; 
+        this.shadowOverlayLayer.renderWebGL = function(){}; 
 
         // Create the shadow filter
         this.shadowFilter = new ShadowFilter(application.renderer.width, application.renderer.height);
 
         // Set up the container mixin so that it tells the filter about the available shadows and objects
-        ContainerSetup(this.objectGroup, this.shadowFilter);
+        ContainerSetup(this.shadowCasterGroup, this.shadowOverlayGroup, this.shadowFilter);
 
         // Overwrite the application render method
         ApplicationSetup(application, this.shadowFilter);
     },
     Shadow,
 
-    // Making all classes available just for if you want to augmnent this code without going into the source and properly building things afterwards
-    __clases: {
+    // Making all classes available for if you want to augmnent this code without going into the source and properly building things afterwards
+    __classes: {
         ContainerSetup,
         ApplicationSetup,
         ShadowFilter,

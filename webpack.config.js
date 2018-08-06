@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
   mode: 'development',
-  entry: './src/demos/pixi-lights/index.js',
+  entry: './src/demos/advanced/index.js',
   output: {
     path: path.resolve(__dirname, 'build/'),
     filename: 'webpack.bundle.js'

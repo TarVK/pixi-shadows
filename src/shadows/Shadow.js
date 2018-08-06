@@ -9,7 +9,7 @@ import ShadowMapFilter from './filters/ShadowMapFilter';
     -scatterRange [number]          The radius at which the points of the light should be scattered. (Greater range = software shadow)
     -radialResolution [number]      The number of rays to draw for the light. (Higher resolution = more precise edges + more intensive)
     -depthResolution [number]       The of steps to take per pixel. (Higher resolution = more precise edges + more intensive)
-    -ignoreObject [Sprite]          A object to ignore while creating the shadows. (Can be used if sprite and light always overlap)
+    -ignoreShadowCaster [Sprite]    A shadow caster to ignore while creating the shadows. (Can be used if sprite and light always overlap)
 */
 
 export default class Shadow extends PIXI.Sprite{
@@ -18,13 +18,13 @@ export default class Shadow extends PIXI.Sprite{
 
         this._range = range;
         this._pointCount = pointCount||20;              //The number of lightpoins
-        this._scatterRange = scatterRange||(this._pointCount==1?0:20);
+        this._scatterRange = scatterRange||(this._pointCount==1?0:15);
         this._intensity = 1;//intensity||1;
         this._radialResolution = 500;
         this._depthResolution = 1;                      //per screen pixel
         this.anchor.set(0.5);
         
-        this._ignoreObject;
+        this._ignoreShadowCaster;
 
         this.__createShadowMapSources();
     }
@@ -67,8 +67,9 @@ export default class Shadow extends PIXI.Sprite{
     }
 
     // Update the map to create the mask from
-    update(renderer, objectSprite){
-        this._objectSprite = objectSprite;
+    update(renderer, shadowCasterSprite, shadowOverlaySprite){
+        this._shadowCasterSprite = shadowCasterSprite;
+        this._shadowOverlaySprite = shadowOverlaySprite;
         renderer.render(this._shadowMapSprite, this._shadowMapResultTexture, true, null, true);
     }
 
@@ -94,8 +95,8 @@ export default class Shadow extends PIXI.Sprite{
     set depthResolution(resolution){
         this._depthResolution = resolution;
     }
-    set ignoreObject(sprite){
-        this.ignoreObject = sprite;
+    set ignoreShadowCaster(sprite){
+        this._ignoreShadowCaster = sprite;
     }
 
     // Attribute getters
@@ -117,7 +118,7 @@ export default class Shadow extends PIXI.Sprite{
     get depthResolution(){
         return this._depthResolution;
     }
-    get ignoreObject(){
-        return this._ignoreObject;
+    get ignoreShadowCaster(){
+        return this._ignoreShadowCaster;
     }
 }

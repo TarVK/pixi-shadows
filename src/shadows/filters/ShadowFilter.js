@@ -42,22 +42,35 @@ export default class ShadowFilter extends PIXI.Filter{
 
         this.uniforms.ambientLight = 0.0;
         this.uniforms.size = [this._width, this._height];
+        this._useShadowCastersAsOverlay = true;
 
-        this.__createObjectSources();
+        this.__createCasterSources();
+        this.__createOverlaySources();
         this.__createMaskSources();
     }
-    // collider objects
-    __createObjectSources(){
-        if(this._objectResultTexture) this._objectResultTexture.destroy();
-        if(this._objectResultSprite) this._objectResultSprite.destroy();
+    // Shadow overlay objects
+    __createOverlaySources(){
+        if(this._shadowOverlayResultTexture) this._shadowOverlayResultTexture.destroy();
+        if(this._shadowOverlayResultSprite) this._shadowOverlayResultSprite.destroy();
 
-        if(!this._objectContainer) this._objectContainer = new PIXI.Container();
+        if(!this._shadowOverlayContainer) this._shadowOverlayContainer = new PIXI.Container();
 
         // Create the final mask to apply to the container that this filter is applied to
-        this._objectResultTexture = PIXI.RenderTexture.create(this._width, this._height);
-        this._objectResultSprite = new PIXI.Sprite(this._objectResultTexture);
+        this._shadowOverlayResultTexture = PIXI.RenderTexture.create(this._width, this._height);
+        this._shadowOverlayResultSprite = new PIXI.Sprite(this._shadowOverlayResultTexture);
     }
-    // final mask to apply as a filter
+    // Shadow caster objects
+    __createCasterSources(){
+        if(this._shadowCasterResultTexture) this._shadowCasterResultTexture.destroy();
+        if(this._shadowCasterResultSprite) this._shadowCasterResultSprite.destroy();
+
+        if(!this._shadowCasterContainer) this._shadowCasterContainer = new PIXI.Container();
+
+        // Create the final mask to apply to the container that this filter is applied to
+        this._shadowCasterResultTexture = PIXI.RenderTexture.create(this._width, this._height);
+        this._shadowCasterResultSprite = new PIXI.Sprite(this._shadowCasterResultTexture);
+    }
+    // Final mask to apply as a filter
     __createMaskSources(){
         if(this._maskResultTexture) this._maskResultTexture.destroy();
         if(this._maskResultSprite) this._maskResultSprite.destroy();
@@ -76,21 +89,38 @@ export default class ShadowFilter extends PIXI.Filter{
 
         this.tick++; // Increase the tick so that shadows and objects know they can add themselves to the container again in their next update
 
+        /* render shadow casters */
         // Remove the parent layer from the objects in order to properly render it to the container
-        this._objectContainer.children.forEach(child => {
+        this._shadowCasterContainer.children.forEach(child => {
             child._activeParentLayer = null;
         });
 
         // Render all the objects onto 1 texture
-        renderer.render(this._objectContainer, this._objectResultTexture, true, null, true);
+        renderer.render(this._shadowCasterContainer, this._shadowCasterResultTexture, true, null, true);
 
         // Remove all the objects from the container
-        this._objectContainer.children.length = 0;
+        this._shadowCasterContainer.children.length = 0;
 
+        /* render shadow overlays */
+        if(!this._useShadowCastersAsOverlay){
+            this._shadowOverlayContainer.children.forEach(child => {
+                child._activeParentLayer = null;
+            });
+    
+            // Render all the objects onto 1 texture
+            renderer.render(this._shadowOverlayContainer, this._shadowOverlayResultTexture, true, null, true);
+    
+            // Remove all the objects from the container
+            this._shadowOverlayContainer.children.length = 0;
+        }
+
+        /* render shadows */
+        
         // Update all shadows and indicate that they may properly be rendered now
+        let overlay = this._useShadowCastersAsOverlay? this._shadowCasterResultSprite: this._shadowOverlayResultSprite;
         this._maskContainer.children.forEach(shadow => {
             shadow.renderStep = true;
-            shadow.update(renderer, this._objectResultSprite);
+            shadow.update(renderer, this._shadowCasterResultSprite, overlay);
         });
 
         // Render all the final shadow masks onto 1 texture
@@ -132,15 +162,20 @@ export default class ShadowFilter extends PIXI.Filter{
         this._width = width;
 
         this.uniforms.size = [this._width, this._height];
-        this.__createObjectSources();
+        this.__createOverlaySources();
+        this.__createCasterSources();
         this.__createMaskSources();
     }
     set height(height){
         this._height = height;
 
         this.uniforms.size = [this._width, this._height];
-        this.__createObjectSources();
+        this.__createOverlaySources();
+        this.__createCasterSources();
         this.__createMaskSources();
+    }
+    set useShadowCasterAsOverlay(val){
+        this._useShadowCastersAsOverlay = val;
     }
 
     // Attribute getters
@@ -152,5 +187,8 @@ export default class ShadowFilter extends PIXI.Filter{
     }
     get height(){
         return this._height;
+    }
+    get useShadowCasterAsOverlay(){
+        return this._useShadowCastersAsOverlay;
     }
 }

@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/TarVK/pixi-shadows",
   "dependencies": {
+    "dat.gui": "^0.7.2",
     "pixi-layers": "^0.1.9",
     "pixi-lights": "^2.0.1",
     "pixi.js": "^4.8.1",

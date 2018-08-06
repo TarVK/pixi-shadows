@@ -6,25 +6,24 @@ export default class ShadowMaskFilter extends PIXI.Filter{
             attribute vec2 aTextureCoord;
             
             uniform mat3 projectionMatrix;
-            uniform mat3 objectMatrix;
+            uniform mat3 overlayMatrix;
             uniform mat3 filterMatrix;
             
             varying vec2 vTextureCoord;
-            varying vec2 vObjectCoord;
+            varying vec2 vOverlayCoord;
             varying vec2 vFilterCoord;
             
             void main(void){
                 gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
                 vTextureCoord = aTextureCoord;
-                vObjectCoord = (objectMatrix * vec3(aTextureCoord, 1.0) ).xy;
+                vOverlayCoord = (overlayMatrix * vec3(aTextureCoord, 1.0) ).xy;
             }
         `,`
-            varying vec2 vObjectCoord;
+            varying vec2 vOverlayCoord;
             varying vec2 vTextureCoord;
             uniform vec4 filterArea;
             
-            uniform sampler2D objectSampler;
-            uniform sampler2D ignoreObjectSampler;
+            uniform sampler2D shadowOverlaySampler;
 
             uniform vec2 dimensions;
 
@@ -51,8 +50,8 @@ export default class ShadowMaskFilter extends PIXI.Filter{
                 // The final intensity of the light at this pixel
                 float totalIntensity = 0.0;
 
-                // The intensity of the pixel in the object map at this pixel
-                vec4 objectPixel = texture2D(objectSampler, vObjectCoord);
+                // The intensity of the pixel in the overlay map at this pixel
+                vec4 overlayPixel = texture2D(shadowOverlaySampler, vOverlayCoord);
 
                 // Go through all light points (at most 1000) to add them to the intensity
                 for(float lightIndex=0.0; lightIndex<1000.0; lightIndex++){
@@ -72,10 +71,10 @@ export default class ShadowMaskFilter extends PIXI.Filter{
                     // Extract the object distance from the depth map pixel
                     float objectDistance = colorToFloat(depthPixel) / 100000.0 * lightRange;
                     
-                    // Calculate the intensity of this pixel based on the objectSampler and objectDistance
+                    // Calculate the intensity of this pixel based on the overlaySampler and objectDistance
                     float intensity = 0.0;
-                    if(objectPixel.a > 0.6){
-                        intensity = (1.0 - pow(distance / lightRange, 0.3)) * objectPixel.a;
+                    if(overlayPixel.a > 0.6){
+                        intensity = (1.0 - pow(distance / lightRange, 0.3)) * overlayPixel.a;
                     }else if (objectDistance > pointDistance || objectDistance >= lightRange) {
                         intensity = 1.0 - distance / lightRange;
                     }
@@ -96,14 +95,14 @@ export default class ShadowMaskFilter extends PIXI.Filter{
 
         this.autoFit = false;
         this.padding = 0;
-        this.objectMatrix = new PIXI.Matrix();
+        this.overlayMatrix = new PIXI.Matrix();
     }
     
     apply(filterManager, input, output){
         // Attach the object sampler
-        var os = this.shadow._objectSprite;
-        this.uniforms.objectSpriteDimensions = [os.width, os.height];
-        this.uniforms.objectSampler = os._texture;
+        var sc = this.shadow._shadowOverlaySprite;
+        this.uniforms.shadowOverlaySpriteDimensions = [sc.width, sc.height];
+        this.uniforms.shadowOverlaySampler = sc._texture;
         
         // Use the world transform (data about the absolute location on the screen) to determine the lights relation to the objectSampler
         var wt = this.shadow.worldTransform;
@@ -119,7 +118,7 @@ export default class ShadowMaskFilter extends PIXI.Filter{
         this.uniforms.dimensions = [texSize, texSize];
         
         // Calculate the object sampler position in relation to the light
-        this.uniforms.objectMatrix = filterManager.calculateSpriteMatrix(this.objectMatrix, os);
+        this.uniforms.overlayMatrix = filterManager.calculateSpriteMatrix(this.overlayMatrix, sc);
         
         // Apply the filter
         filterManager.applyFilter(this, input, output);

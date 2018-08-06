@@ -28,7 +28,7 @@ stage.addChild(world);
 // Set up the shadow layer
 stage.addChild(PIXI.shadows.objectLayer);
 
-// Set up pixi layers
+// Set up pixi light's layers
 var diffuseLayer = new PIXI.display.Layer(PIXI.lights.diffuseGroup);
 var diffuseBlackSprite = new PIXI.Sprite(diffuseLayer.getRenderTexture());
 diffuseBlackSprite.tint = 0;
@@ -87,8 +87,8 @@ light.position.set(300, 300);
 world.addChild(light);
 
 // Create a background (that doesn't cast shadows)
-var bgDiffuseTexture = PIXI.Texture.fromImage('/demos/pixi-lights/assets/BGTextureTest.jpg');
-var bgNormalTexture = PIXI.Texture.fromImage('/demos/pixi-lights/assets/BGTextureNORM.jpg');
+var bgDiffuseTexture = PIXI.Texture.fromImage('/demos/pixi-lights/assets/background.jpg');
+var bgNormalTexture = PIXI.Texture.fromImage('/demos/pixi-lights/assets/backgroundNormalMap.jpg');
 var background = create3DSprite(bgDiffuseTexture, bgNormalTexture);
 world.addChild(background);
 
@@ -107,7 +107,6 @@ world.addChild(block2);
 var block3 = create3DSprite(blockDiffuse, blockNormal, blockDiffuse);
 block3.position.set(300, 300);
 world.addChild(block3);
-// stage.addChild(PIXI.shadows.shadowFilter._maskResultSprite);
 
 // Make the light track your mouse
 world.interactive = true;
