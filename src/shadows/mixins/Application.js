@@ -19,5 +19,4 @@ export default function augment(application, shadowFilter){
 
     // Reassign ticker because its setter initialises the render method
     application.ticker = application.ticker;
-    console.log(application, application.ticker);
 }

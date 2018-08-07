@@ -57,6 +57,7 @@ export default class ShadowFilter extends PIXI.Filter{
 
         // Create the final mask to apply to the container that this filter is applied to
         this._shadowOverlayResultTexture = PIXI.RenderTexture.create(this._width, this._height);
+        this._shadowOverlayResultTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
         this._shadowOverlayResultSprite = new PIXI.Sprite(this._shadowOverlayResultTexture);
     }
     // Shadow caster objects
@@ -68,6 +69,7 @@ export default class ShadowFilter extends PIXI.Filter{
 
         // Create the final mask to apply to the container that this filter is applied to
         this._shadowCasterResultTexture = PIXI.RenderTexture.create(this._width, this._height);
+        this._shadowCasterResultTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
         this._shadowCasterResultSprite = new PIXI.Sprite(this._shadowCasterResultTexture);
     }
     // Final mask to apply as a filter
@@ -80,6 +82,7 @@ export default class ShadowFilter extends PIXI.Filter{
 
         // Create the final mask to apply to the container that this filter is applied to
         this._maskResultTexture = PIXI.RenderTexture.create(this._width, this._height);
+        this._maskResultTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
         if(!this._maskContainer) this._maskContainer = new PIXI.Container();
         this._maskResultSprite = new PIXI.Sprite(this._maskResultTexture);
     }

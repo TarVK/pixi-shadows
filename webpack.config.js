@@ -1,16 +1,15 @@
 const path = require('path');
+const name = 'pixi-shadows';
 
-module.exports = {
+module.exports = [{
   mode: 'development',
-  entry: './src/demos/advanced/index.js',
+  entry: path.join(__dirname, 'src', 'shadows', "index.js"),
   output: {
-    path: path.resolve(__dirname, 'build/'),
-    filename: 'webpack.bundle.js'
-  },
-  devServer: {
-    contentBase: [path.join(__dirname, 'public'), path.join(__dirname, 'src')],
-    compress: true,
-    port: 3000
+    path: path.join(__dirname, 'build', 'shadows', 'client'),
+    filename: name+'.js',
+    library: name,
+    libraryTarget: 'umd',
+    umdNamedDefine: true
   },
   devtool: 'source-map',
   module: {
@@ -36,4 +35,39 @@ module.exports = {
       }
     ]
   }
-};
+},{
+  mode: 'development',
+  entry: path.join(__dirname, 'src', 'shadows', "index.js"),
+  target: 'node',
+  output: {
+    path: path.join(__dirname, 'build', 'shadows', 'node'),
+    filename: name+'.js',
+    library: name,
+    libraryTarget: 'umd',
+    umdNamedDefine: true
+  },
+  devtool: 'source-map',
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /(node_modules|bower_components)/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [
+              [
+                'env',
+                {
+                  targets: {
+                    browsers: ['last 3 versions']
+                  }
+                }
+              ]
+            ]
+          }
+        }
+      }
+    ]
+  }
+}];

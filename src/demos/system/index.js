@@ -5,20 +5,19 @@ import '../../shadows'; // This plugin, I use a relative path, but you would use
 
 // Debug/demo imports
 import * as dat from 'dat.gui';
-import Stats from 'stats-js';
 
 /* The actual demo code: */
 
 // Some general settings for the demo
 var demoOptions = {
-    followMouse: false,
+    followMouse: true,
     shadowX: 450,
     shadowY: 150,
 };
 
 // Create your application
 var width = 800;
-var height = 500;
+var height = 700;
 var app = new PIXI.Application(width, height);
 document.body.appendChild(app.view);
 
@@ -69,11 +68,6 @@ function createShadowSprite(texture, shadowTexture, shadowOverlayTexture) {
 // Can set ambientLight for the shadow filter, making the shadow less dark: 
 // PIXI.shadows.shadowFilter.ambientLight = 0.4;
 
-// Create a light that casts shadows
-var shadow = new PIXI.shadows.Shadow(700, 1);
-shadow.position.set(demoOptions.shadowX, demoOptions.shadowY);
-world.addChild(shadow);
-
 // Create a background (that doesn't cast shadows)
 var bgTexture = PIXI.Texture.fromImage('/demos/advanced/assets/background.jpg');
 var background = new PIXI.Sprite(bgTexture);
@@ -81,26 +75,38 @@ world.addChild(background);
 
 // Create some shadow casting demons
 var demonTexture = PIXI.Texture.fromImage('/demos/advanced/assets/flameDemon.png');
-var demonShadowTexture = PIXI.Texture.fromImage('/demos/advanced/assets/flameDemonShadow.png');
-var demonTexture2 = PIXI.Texture.fromImage('/demos/advanced/assets/flameDemon2.png');
 demonTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST; //For pixelated scaling
-demonShadowTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-demonTexture2.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
 
-var demon1 = createShadowSprite(demonTexture2, demonTexture2);
+var demon1 = createShadowSprite(demonTexture, demonTexture, demonTexture);
 demon1.position.set(100, 100);
 demon1.scale.set(3);
 world.addChild(demon1);
 
-var demon2 = createShadowSprite(demonTexture, demonShadowTexture, demonTexture);
+var demon2 = createShadowSprite(demonTexture, demonTexture, demonTexture);
 demon2.position.set(500, 100);
 demon2.scale.set(3);
 world.addChild(demon2);
 
-var demon3 = createShadowSprite(demonTexture2, demonTexture2, demonTexture2);
+var demon3 = createShadowSprite(demonTexture, demonTexture, demonTexture);
 demon3.position.set(300, 200);
 demon3.scale.set(3);
 world.addChild(demon3);
+
+// Create a light that casts shadows
+var shadow = new PIXI.shadows.Shadow(300, 1, 5);
+shadow.position.set(demoOptions.shadowX, demoOptions.shadowY);
+world.addChild(shadow);
+
+// Show shadow map
+function showShadowMap(){
+    var shadowMapSprite = shadow._shadowMapResultSprite;
+    shadowMapSprite.x = 0;
+    shadowMapSprite.y = 500;
+    shadowMapSprite.width = 800;
+    shadowMapSprite.height = 200;
+    stage.addChild(shadowMapSprite);
+}
+showShadowMap();
 
 // Make the light track your mouse
 world.interactive = true;
@@ -113,25 +119,7 @@ world.on('mousemove', function(event){
     }
 });
 
-// Create a light point on click
-world.on('pointerdown', function(event){
-    var shadow = new PIXI.shadows.Shadow(700, 0.7);
-    shadow.position.copy(event.data.global);
-    world.addChild(shadow);
-});
-
 /* The debug debug/demo code */
-
-// Add fps counter
-var stats = new Stats();
-stats.setMode(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-document.body.appendChild(stats.domElement);
-stats.domElement.style.position = 'absolute';
-stats.domElement.style.top = 0;
-app.ticker.add(function(){
-    stats.begin();
-    stats.end();
-});
 
 // Add settings controls
 var gui = new dat.GUI();
@@ -148,36 +136,25 @@ var shadowGUI = gui.addFolder("Shadow properties");
 shadowGUI.open();
 shadowGUI.add(shadow, "range", 50, 1000);
 shadowGUI.add(shadow, "intensity", 0, 3);
-shadowGUI.add(shadow, "pointCount", 1, 50, 1);
+shadowGUI.add(shadow, "pointCount", 1, 50, 1).onChange(showShadowMap)
 shadowGUI.add(shadow, "scatterRange", 0, 50);
-shadowGUI.add(shadow, "radialResolution", 100, 1500, 1);
+shadowGUI.add(shadow, "radialResolution", 100, 1500, 1).onChange(showShadowMap);
 shadowGUI.add(shadow, "depthResolution", 0.1, 3);
 
-// Filter controls
-var filter = PIXI.shadows.shadowFilter;
-var filterGUI = gui.addFolder("Filter properties");
-filterGUI.open();
-filterGUI.add(filter, "width", 100, 1920, 1);
-filterGUI.add(filter, "height", 100, 1080, 1);
-filterGUI.add(filter, "ambientLight", 0, 1, 0.01);
-filterGUI.add(filter, "useShadowCasterAsOverlay");
-
 // Show specific layers
-var revealGUI = gui.addFolder("Show layers (for debugging)");
-var reveal = {
-    textures: false,
-    casters: false,
-    overlays: false
-};
-revealGUI.add(reveal, "textures").onChange(function(value){
-    if(value)   world.filters = [];
-    else        world.filters = [PIXI.shadows.shadowFilter];
+var revealGUI = gui.addFolder("Analyze");
+revealGUI.open();
+var reveal = {};
+reveal["show shadow mask"] = false;
+reveal["remove casters"] = false;
+reveal["remove overlays"] = false;
+revealGUI.add(reveal, "show shadow mask").onChange(function(value){
+    if(value)   stage.addChild(PIXI.shadows.shadowFilter._maskResultSprite);
+    else        stage.removeChild(PIXI.shadows.shadowFilter._maskResultSprite);
 });
-revealGUI.add(reveal, "casters").onChange(function(value){
-    if(value)   stage.addChild(PIXI.shadows.shadowFilter._shadowCasterResultSprite);
-    else        stage.removeChild(PIXI.shadows.shadowFilter._shadowCasterResultSprite);
+revealGUI.add(reveal, "remove casters").onChange(function(value){
+    PIXI.shadows.shadowFilter._shadowCasterContainer.visible = !value;
 });
-revealGUI.add(reveal, "overlays").onChange(function(value){
-    if(value)   stage.addChild(PIXI.shadows.shadowFilter._shadowOverlayResultSprite);
-    else        stage.removeChild(PIXI.shadows.shadowFilter._shadowOverlayResultSprite);
+revealGUI.add(reveal, "remove overlays").onChange(function(value){
+    PIXI.shadows.shadowFilter._shadowOverlayContainer.visible = !value;
 });

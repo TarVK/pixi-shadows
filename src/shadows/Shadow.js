@@ -19,8 +19,8 @@ export default class Shadow extends PIXI.Sprite{
         this._range = range;
         this._pointCount = pointCount||20;              //The number of lightpoins
         this._scatterRange = scatterRange||(this._pointCount==1?0:15);
-        this._intensity = 1;//intensity||1;
-        this._radialResolution = 500;
+        this._intensity = intensity||1;
+        this._radialResolution = 800;
         this._depthResolution = 1;                      //per screen pixel
         this.anchor.set(0.5);
         
@@ -41,6 +41,7 @@ export default class Shadow extends PIXI.Sprite{
         
         // A blank texture/sprite to apply the filter to 
         this._shadowMapResultTexture = PIXI.RenderTexture.create(this._radialResolution, this._pointCount);
+        this._shadowMapResultTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
         this._shadowMapSprite = new PIXI.Sprite(this._shadowMapResultTexture);
         this._shadowMapSprite.filters = [new ShadowMapFilter(this)];
         

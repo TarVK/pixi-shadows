@@ -10,8 +10,8 @@ PIXI.lights = PixiLights;
 /* The actual demo code: */
 
 // Create your application
-var width = 880;
-var height = 600;
+var width = 800;
+var height = 500;
 var app = new PIXI.Application(width, height);
 document.body.appendChild(app.view);
 
@@ -26,7 +26,8 @@ var world = new PIXI.Container();
 stage.addChild(world);
 
 // Set up the shadow layer
-stage.addChild(PIXI.shadows.objectLayer);
+stage.addChild(PIXI.shadows.shadowCasterLayer);
+stage.addChild(PIXI.shadows.shadowOverlayLayer);
 
 // Set up pixi light's layers
 var diffuseLayer = new PIXI.display.Layer(PIXI.lights.diffuseGroup);
@@ -55,7 +56,7 @@ function create3DSprite(diffuseTex, normalTex, shadowTexture) {
 
     if(shadowTexture){ // Only create a shadow casting object if a texture is provided
         var shadowCastingSprite = new PIXI.Sprite(shadowTexture);
-        shadowCastingSprite.parentGroup = PIXI.shadows.objectGroup;
+        shadowCastingSprite.parentGroup = PIXI.shadows.shadowCasterGroup;
         container.addChild(shadowCastingSprite);
     }
 
@@ -87,14 +88,14 @@ light.position.set(300, 300);
 world.addChild(light);
 
 // Create a background (that doesn't cast shadows)
-var bgDiffuseTexture = PIXI.Texture.fromImage('/demos/pixi-lights/assets/background.jpg');
-var bgNormalTexture = PIXI.Texture.fromImage('/demos/pixi-lights/assets/backgroundNormalMap.jpg');
+var bgDiffuseTexture = PIXI.Texture.fromImage('assets/background.jpg', true);
+var bgNormalTexture = PIXI.Texture.fromImage('assets/backgroundNormalMap.jpg');
 var background = create3DSprite(bgDiffuseTexture, bgNormalTexture);
 world.addChild(background);
 
 // Create some shadow casting blocks
-var blockDiffuse = PIXI.Texture.fromImage('/demos/pixi-lights/assets/cutBlock.png');
-var blockNormal = PIXI.Texture.fromImage('/demos/pixi-lights/assets/cutBlockNormalMap.png');
+var blockDiffuse = PIXI.Texture.fromImage('assets/cutBlock.png');
+var blockNormal = PIXI.Texture.fromImage('assets/cutBlockNormalMap.png');
 
 var block1 = create3DSprite(blockDiffuse, blockNormal, blockDiffuse);
 block1.position.set(100, 200);

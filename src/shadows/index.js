@@ -1,6 +1,3 @@
-import 'pixi.js';
-import 'pixi-layers';
-
 import ContainerSetup from './mixins/Container';
 import ApplicationSetup from './mixins/Application';
 import ShadowFilter from './filters/ShadowFilter';
