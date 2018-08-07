@@ -46974,14 +46974,14 @@ shadow.position.set(demoOptions.shadowX, demoOptions.shadowY);
 world.addChild(shadow);
 
 // Create a background (that doesn't cast shadows)
-var bgTexture = PIXI.Texture.fromImage('/demos/advanced/assets/background.jpg');
+var bgTexture = PIXI.Texture.fromImage('assets/background.jpg');
 var background = new PIXI.Sprite(bgTexture);
 world.addChild(background);
 
 // Create some shadow casting demons
-var demonTexture = PIXI.Texture.fromImage('/demos/advanced/assets/flameDemon.png');
-var demonShadowTexture = PIXI.Texture.fromImage('/demos/advanced/assets/flameDemonShadow.png');
-var demonTexture2 = PIXI.Texture.fromImage('/demos/advanced/assets/flameDemon2.png');
+var demonTexture = PIXI.Texture.fromImage('assets/flameDemon.png');
+var demonShadowTexture = PIXI.Texture.fromImage('assets/flameDemonShadow.png');
+var demonTexture2 = PIXI.Texture.fromImage('assets/flameDemon2.png');
 demonTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST; //For pixelated scaling
 demonShadowTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
 demonTexture2.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
