@@ -6,7 +6,13 @@ The lights themselves are very simple, and this plugin purely focuses on the sha
 
 ## Disclaimer
 This plugin was made by a very inexperienced developer in the field.
-I made it for usage in a personal project, and how to learn how to work with glsl to achieve this. I don't even have any real experience with opengl/webgl, so things are most likely not optimised. Any feedback is appreciated! 
+I made it for usage in a personal project, and had to learn how to work with glsl to achieve this. I don't even have any real experience with opengl/webgl, so things are most likely not optimised. Any feedback is appreciated! 
+
+## Installation
+```
+npm install pixi-shadows
+```
+or copy [the pixi-shadows script](https://github.com/TarVK/pixi-shadows/blob/master/build/shadows/client/pixi-shadows.js) manually for usage without npm.
 
 ## Dependencies
 Usage dependencies:
