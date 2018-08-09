@@ -164,10 +164,10 @@ Step by step description of what happens for each rendered frame:
 3. Use the mask texture in the shadow filter to perform a mask on the container that the filter is added to. 
 
 ## Demos overview
-* (Basic demo)[https://tarvk.github.io/pixi-shadows/build/demos/basic/]
-* (Advanced demo)[https://tarvk.github.io/pixi-shadows/build/demos/advanced/]
-* (Pixi-lights demo)[https://tarvk.github.io/pixi-shadows/build/demos/pixi-lights/]
-* (Process demo)[https://tarvk.github.io/pixi-shadows/build/demos/system/]
+* [Basic demo](ttps://tarvk.github.io/pixi-shadows/build/demos/basic/)
+* [Advanced demo](https://tarvk.github.io/pixi-shadows/build/demos/advanced/)
+* [Pixi-lights demo](https://tarvk.github.io/pixi-shadows/build/demos/pixi-lights/)
+* [Process demo](https://tarvk.github.io/pixi-shadows/build/demos/system/)
 
 ## Using the development environment
 ### Setup
