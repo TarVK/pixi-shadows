@@ -16,30 +16,7 @@ var app = new PIXI.Application(width, height);
 document.body.appendChild(app.view);
 
 // Initialise the shadows plugin
-PIXI.shadows.init(app);
-
-// Make sure to overwrite the stage, otherwise pixi-layers won't work
-var stage = app.stage = new PIXI.display.Stage();
-
-// Create a container for all objects
-var world = new PIXI.Container();
-stage.addChild(world);
-
-// Set up the shadow layer
-stage.addChild(PIXI.shadows.shadowCasterLayer);
-stage.addChild(PIXI.shadows.shadowOverlayLayer);
-
-// Set up pixi light's layers
-var diffuseLayer = new PIXI.display.Layer(PIXI.lights.diffuseGroup);
-var diffuseBlackSprite = new PIXI.Sprite(diffuseLayer.getRenderTexture());
-diffuseBlackSprite.tint = 0;
-stage.addChild(diffuseLayer);
-stage.addChild(diffuseBlackSprite);
-stage.addChild(new PIXI.display.Layer(PIXI.lights.normalGroup));
-stage.addChild(new PIXI.display.Layer(PIXI.lights.lightGroup));
-
-// Add the shadow filter to the diffuse layer
-diffuseLayer.filters = [PIXI.shadows.shadowFilter];
+var world = PIXI.shadows.init(app, world);
 
 // A function to combine different assets if your world object, but give them a common transform by using pixi-layers
 // It is of course recommended to create a custom class for this, but this demo just shows the minimal steps required
@@ -56,7 +33,7 @@ function create3DSprite(diffuseTex, normalTex, shadowTexture) {
 
     if(shadowTexture){ // Only create a shadow casting object if a texture is provided
         var shadowCastingSprite = new PIXI.Sprite(shadowTexture);
-        shadowCastingSprite.parentGroup = PIXI.shadows.shadowCasterGroup;
+        shadowCastingSprite.parentGroup = PIXI.shadows.casterGroup;
         container.addChild(shadowCastingSprite);
     }
 
@@ -80,7 +57,7 @@ function createLight(radius, intensity, color){
 world.addChild(new PIXI.lights.AmbientLight(null, 1));
 world.addChild(new PIXI.lights.DirectionalLight(null, 1, new PIXI.Point(0, 1))); // pixi-shadows doesn't support directional shadows yet
 // Can also set ambientLight for the shadow filter, making the shadow less dark: 
-// PIXI.shadows.shadowFilter.ambientLight = 0.4;
+// PIXI.shadows.filter.ambientLight = 0.4;
 
 // Create a light that casts shadows
 var light = createLight(700, 4, 0xffffff);
@@ -117,7 +94,7 @@ world.on('mousemove', function(event){
 
 // Create a light point on click
 world.on('pointerdown', function(event){
-    var light = createLight(300, 2, 0xffffff);
+    var light = createLight(450, 2, 0xffffff);
     light.position.copy(event.data.global);
     world.addChild(light);
 });

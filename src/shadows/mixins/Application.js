@@ -1,4 +1,7 @@
 export default function augment(application, shadowFilter){
+    // Replace the stage with a layered stage
+    application.stage = new PIXI.display.Stage();
+
     // Remove the current render fucntion
     application.ticker.remove(application.render, application); 
 

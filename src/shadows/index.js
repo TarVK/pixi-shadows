@@ -9,25 +9,59 @@ import Shadow from './Shadow';
 PIXI.shadows = {
     init: function(application){
         // The objects that will cast shadows
-        this.shadowCasterGroup = new PIXI.display.Group();
-        this.shadowCasterLayer = new PIXI.display.Layer(this.shadowCasterGroup);
+        this.casterGroup = new PIXI.display.Group();
+        this.casterLayer = new PIXI.display.Layer(this.casterGroup);
 
         // The objects that will remain ontop of the shadows
-        this.shadowOverlayGroup = new PIXI.display.Group();
-        this.shadowOverlayLayer = new PIXI.display.Layer(this.shadowOverlayGroup);
+        this.overlayGroup = new PIXI.display.Group();
+        this.overlayLayer = new PIXI.display.Layer(this.overlayGroup);
 
         // Make sure the caster objects aren't actually visible
-        this.shadowCasterLayer.renderWebGL = function(){}; 
-        this.shadowOverlayLayer.renderWebGL = function(){}; 
+        this.casterLayer.renderWebGL = function(){}; 
+        this.overlayLayer.renderWebGL = function(){}; 
 
         // Create the shadow filter
-        this.shadowFilter = new ShadowFilter(application.renderer.width, application.renderer.height);
+        this.filter = new ShadowFilter(application.renderer.width, application.renderer.height);
 
         // Set up the container mixin so that it tells the filter about the available shadows and objects
-        ContainerSetup(this.shadowCasterGroup, this.shadowOverlayGroup, this.shadowFilter);
+        ContainerSetup(this.casterGroup, this.overlayGroup, this.filter);
 
         // Overwrite the application render method
-        ApplicationSetup(application, this.shadowFilter);
+        ApplicationSetup(application, this.filter);
+
+        // If a container is specified, set up the filter
+        var container = new PIXI.Container();
+        application.stage.addChild(container);
+
+        // Set up the shadow layers
+        application.stage.addChild(
+            this.casterLayer,
+            this.overlayLayer
+        );
+
+        // Set up pixi lights if available
+        if(PIXI.lights){
+            // Set up pixi-light's layers
+            var diffuseLayer = new PIXI.display.Layer(PIXI.lights.diffuseGroup);
+            var diffuseBlackSprite = new PIXI.Sprite(diffuseLayer.getRenderTexture());
+            diffuseBlackSprite.tint = 0;
+            application.stage.addChild(
+                diffuseLayer,
+                diffuseBlackSprite,
+                new PIXI.display.Layer(PIXI.lights.normalGroup),
+                new PIXI.display.Layer(PIXI.lights.lightGroup)
+            );
+
+            // Add the shadow filter to the diffuse layer
+            diffuseLayer.filters = [this.filter];
+        }else{
+
+            // Add the shadow filter to the container
+            container.filters = [this.filter];
+        }
+
+        // Rreturn the container to use
+        return container;
     },
     Shadow,
 

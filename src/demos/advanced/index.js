@@ -23,22 +23,8 @@ var app = new PIXI.Application(width, height);
 document.body.appendChild(app.view);
 
 // Initialise the shadows plugin
-PIXI.shadows.init(app);
-
-// Make sure to overwrite the stage, otherwise pixi-layers won't work
-var stage = app.stage = new PIXI.display.Stage();
-
-// Create a container for all objects
-var world = new PIXI.Container();
-stage.addChild(world);
-
-// Set up the shadow layer
-stage.addChild(PIXI.shadows.shadowCasterLayer);
-stage.addChild(PIXI.shadows.shadowOverlayLayer);
-
-// Add the shadow filter to the diffuse layer
-world.filters = [PIXI.shadows.shadowFilter];
-PIXI.shadows.shadowFilter.useShadowCasterAsOverlay = false // Allows us to customise the overlays
+var world = PIXI.shadows.init(app);
+PIXI.shadows.filter.useShadowCasterAsOverlay = false // Allows us to customise the overlays
 
 // A function to combine different assets if your world object, but give them a common transform by using pixi-layers
 // It is of course recommended to create a custom class for this, but this demo just shows the minimal steps required
@@ -48,14 +34,14 @@ function createShadowSprite(texture, shadowTexture, shadowOverlayTexture) {
     // Things that create shadows
     if(shadowTexture){
         var shadowCastingSprite = new PIXI.Sprite(shadowTexture);
-        shadowCastingSprite.parentGroup = PIXI.shadows.shadowCasterGroup;
+        shadowCastingSprite.parentGroup = PIXI.shadows.casterGroup;
         container.addChild(shadowCastingSprite);
     }
     
     // Things that are ontop of shadows
     if(shadowOverlayTexture){
         var shadowOverlaySprite = new PIXI.Sprite(shadowOverlayTexture);
-        shadowOverlaySprite.parentGroup = PIXI.shadows.shadowOverlayGroup;
+        shadowOverlaySprite.parentGroup = PIXI.shadows.overlayGroup;
         container.addChild(shadowOverlaySprite);
     }
     
@@ -67,7 +53,7 @@ function createShadowSprite(texture, shadowTexture, shadowOverlayTexture) {
 }
 
 // Can set ambientLight for the shadow filter, making the shadow less dark: 
-// PIXI.shadows.shadowFilter.ambientLight = 0.4;
+// PIXI.shadows.filter.ambientLight = 0.4;
 
 // Create a light that casts shadows
 var shadow = new PIXI.shadows.Shadow(700, 1);
@@ -114,10 +100,16 @@ world.on('mousemove', function(event){
 });
 
 // Create a light point on click
+var shadows = [];
 world.on('pointerdown', function(event){
     var shadow = new PIXI.shadows.Shadow(700, 0.7);
+    shadows.push(shadow);
     shadow.position.copy(event.data.global);
     world.addChild(shadow);
+
+    // Set the ignore shadow caster if enabled
+    if(ignore["placed shadows"])
+        shadow.ignoreShadowCaster = demon1.children[0];
 });
 
 /* The debug debug/demo code */
@@ -154,13 +146,30 @@ shadowGUI.add(shadow, "radialResolution", 100, 1500, 1);
 shadowGUI.add(shadow, "depthResolution", 0.1, 3);
 
 // Filter controls
-var filter = PIXI.shadows.shadowFilter;
+var filter = PIXI.shadows.filter;
 var filterGUI = gui.addFolder("Filter properties");
 filterGUI.open();
 filterGUI.add(filter, "width", 100, 1920, 1);
 filterGUI.add(filter, "height", 100, 1080, 1);
 filterGUI.add(filter, "ambientLight", 0, 1, 0.01);
 filterGUI.add(filter, "useShadowCasterAsOverlay");
+
+// Ignore caster example
+var ignoreCasterGUI = gui.addFolder("Ignore caster per shadow");
+var ignore = {};
+ignore["main shadow"] = false;
+ignore["placed shadows"] = false;
+ignoreCasterGUI.add(ignore, "main shadow").onChange(function(value){
+    if(value)   shadow.ignoreShadowCaster = demon1.children[0];
+    else        shadow.ignoreShadowCaster = null;
+});
+ignoreCasterGUI.add(ignore, "placed shadows").onChange(function(value){
+    for(var i=0; i<shadows.length; i++){
+        var shadow = shadows[i];
+        if(value)   shadow.ignoreShadowCaster = demon1.children[0];
+        else        shadow.ignoreShadowCaster = null;
+    }
+});
 
 // Show specific layers
 var revealGUI = gui.addFolder("Show layers (for debugging)");
@@ -171,13 +180,13 @@ var reveal = {
 };
 revealGUI.add(reveal, "textures").onChange(function(value){
     if(value)   world.filters = [];
-    else        world.filters = [PIXI.shadows.shadowFilter];
+    else        world.filters = [PIXI.shadows.filter];
 });
 revealGUI.add(reveal, "casters").onChange(function(value){
-    if(value)   stage.addChild(PIXI.shadows.shadowFilter._shadowCasterResultSprite);
-    else        stage.removeChild(PIXI.shadows.shadowFilter._shadowCasterResultSprite);
+    if(value)   app.stage.addChild(PIXI.shadows.filter._shadowCasterResultSprite);
+    else        app.stage.removeChild(PIXI.shadows.filter._shadowCasterResultSprite);
 });
 revealGUI.add(reveal, "overlays").onChange(function(value){
-    if(value)   stage.addChild(PIXI.shadows.shadowFilter._shadowOverlayResultSprite);
-    else        stage.removeChild(PIXI.shadows.shadowFilter._shadowOverlayResultSprite);
+    if(value)   app.stage.addChild(PIXI.shadows.filter._shadowOverlayResultSprite);
+    else        app.stage.removeChild(PIXI.shadows.filter._shadowOverlayResultSprite);
 });

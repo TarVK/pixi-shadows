@@ -1,0 +1,200 @@
+<!doctype html>
+<!-- Generated using https://github.com/mixu/markdown-styles -->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+    <title>pixi-shadows</title>
+    <link type="text/css" rel="stylesheet" href="indexAssets/css/github-markdown.css">
+    <link type="text/css" rel="stylesheet" href="indexAssets/css/pilcrow.css">
+    <link type="text/css" rel="stylesheet" href="indexAssets/css/hljs-github.min.css"/>
+  </head>
+  <body>
+    <article class="markdown-body"><h1 id="pixi-shadows"><a class="header-link" href="#pixi-shadows"></a>pixi-shadows</h1>
+<p>Pixi-shadows allows you to add shadows and lights to your pixi stage.
+The lights themselves are very simple, and this plugin purely focuses on the shadows. If you are interested in high quality lighting, you can easily combine this plugin with the <a href="https://github.com/pixijs/pixi-lights">pixi-lights</a> plugin. Check out the main demo <a href="https://tarvk.github.io/pixi-shadows/build/demos/basic/">here</a>.</p>
+<p class="img-container"><img src="https://github.com/TarVK/pixi-shadows/raw/master/teaser.png" alt="Teaser image"></p>
+<h2 id="disclaimer"><a class="header-link" href="#disclaimer"></a>Disclaimer</h2>
+<p>This plugin was made by a very inexperienced developer in the field.
+I made it for usage in a personal project, and how to learn how to work with glsl to achieve this. I don&#39;t even have any real experience with opengl/webgl, so things are most likely not optimised. Any feedback is appreciated! </p>
+<h2 id="dependencies"><a class="header-link" href="#dependencies"></a>Dependencies</h2>
+<p>Usage dependencies:</p>
+<ul class="list">
+<li><a href="https://github.com/pixijs/pixi.js/">pixi v4</a>: Tested with version 4.8.0</li>
+<li><a href="https://github.com/pixijs/pixi-display">pixi-layers</a>: Tested with version 0.1.9</li>
+<li><a href="https://github.com/pixijs/pixi-lights">pixi-lights</a>: (optional) Tested with version 2.0.1</li>
+</ul>
+<p>Dev dependencies:</p>
+<ul class="list">
+<li><a href="https://nodejs.org/en/">node.js</a></li>
+<li><a href="https://webpack.js.org/">webpack</a></li>
+<li><a href="https://github.com/webpack/webpack-dev-server">webpack-server</a></li>
+<li><a href="https://babeljs.io/">babel</a></li>
+</ul>
+<h2 id="usage"><a class="header-link" href="#usage"></a>Usage</h2>
+<p>Too quickly get going, check out <a href="https://tarvk.github.io/pixi-shadows/build/demos/basic/">this example</a>:</p>
+<pre class="hljs"><code><span class="hljs-comment">// Import everything, can of course just use &lt;script&gt; tags on your page as well.</span>
+<span class="hljs-keyword">import</span> <span class="hljs-string">'pixi.js'</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-string">'pixi-layers'</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-string">'pixi-shadows'</span>;
+
+<span class="hljs-comment">/* The actual demo code: */</span>
+
+<span class="hljs-comment">// Create your application</span>
+<span class="hljs-keyword">var</span> width = <span class="hljs-number">800</span>;
+<span class="hljs-keyword">var</span> height = <span class="hljs-number">500</span>;
+<span class="hljs-keyword">var</span> app = <span class="hljs-keyword">new</span> PIXI.Application(width, height);
+<span class="hljs-built_in">document</span>.body.appendChild(app.view);
+
+<span class="hljs-comment">// Create a world container</span>
+<span class="hljs-keyword">var</span> world = PIXI.shadows.init(app, world);
+
+<span class="hljs-comment">// A function to combine different assets if your world object, but give them a common transform by using pixi-layers</span>
+<span class="hljs-comment">// It is of course recommended to create a custom class for this, but this demo just shows the minimal steps required</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createShadowSprite</span>(<span class="hljs-params">texture, shadowTexture</span>) </span>{
+    <span class="hljs-keyword">var</span> container = <span class="hljs-keyword">new</span> PIXI.Container(); <span class="hljs-comment">// This represents your final 'sprite'</span>
+
+    <span class="hljs-comment">// Things that create shadows</span>
+    <span class="hljs-keyword">if</span>(shadowTexture){
+        <span class="hljs-keyword">var</span> shadowCastingSprite = <span class="hljs-keyword">new</span> PIXI.Sprite(shadowTexture);
+        shadowCastingSprite.parentGroup = PIXI.shadows.casterGroup;
+        container.addChild(shadowCastingSprite);
+    }
+
+    <span class="hljs-comment">// The things themselves (their texture)</span>
+    <span class="hljs-keyword">var</span> sprite = <span class="hljs-keyword">new</span> PIXI.Sprite(texture);
+    container.addChild(sprite);
+
+    <span class="hljs-keyword">return</span> container;
+}
+
+<span class="hljs-comment">// Create a light that casts shadows</span>
+<span class="hljs-keyword">var</span> shadow = <span class="hljs-keyword">new</span> PIXI.shadows.Shadow(<span class="hljs-number">700</span>, <span class="hljs-number">1</span>);
+shadow.position.set(<span class="hljs-number">450</span>, <span class="hljs-number">150</span>);
+world.addChild(shadow);
+
+<span class="hljs-comment">// Create a background (that doesn't cast shadows)</span>
+<span class="hljs-keyword">var</span> bgTexture = PIXI.Texture.fromImage(<span class="hljs-string">'assets/background.jpg'</span>);
+<span class="hljs-keyword">var</span> background = <span class="hljs-keyword">new</span> PIXI.Sprite(bgTexture);
+world.addChild(background);
+
+<span class="hljs-comment">// Create some shadow casting demons</span>
+<span class="hljs-keyword">var</span> demonTexture = PIXI.Texture.fromImage(<span class="hljs-string">'assets/flameDemon.png'</span>);
+demonTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST; <span class="hljs-comment">//For pixelated scaling</span>
+
+<span class="hljs-keyword">var</span> demon1 = createShadowSprite(demonTexture, demonTexture);
+demon1.position.set(<span class="hljs-number">100</span>, <span class="hljs-number">100</span>);
+demon1.scale.set(<span class="hljs-number">3</span>);
+world.addChild(demon1);
+
+<span class="hljs-keyword">var</span> demon2 = createShadowSprite(demonTexture, demonTexture);
+demon2.position.set(<span class="hljs-number">500</span>, <span class="hljs-number">100</span>);
+demon2.scale.set(<span class="hljs-number">3</span>);
+world.addChild(demon2);
+
+<span class="hljs-keyword">var</span> demon3 = createShadowSprite(demonTexture, demonTexture);
+demon3.position.set(<span class="hljs-number">300</span>, <span class="hljs-number">200</span>);
+demon3.scale.set(<span class="hljs-number">3</span>);
+world.addChild(demon3);
+
+<span class="hljs-comment">// Make the light track your mouse</span>
+world.interactive = <span class="hljs-literal">true</span>;
+world.on(<span class="hljs-string">'mousemove'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">event</span>)</span>{
+    shadow.position.copy(event.data.global);
+});
+
+<span class="hljs-comment">// Create a light point on click</span>
+world.on(<span class="hljs-string">'pointerdown'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">event</span>)</span>{
+    <span class="hljs-keyword">var</span> shadow = <span class="hljs-keyword">new</span> PIXI.shadows.Shadow(<span class="hljs-number">700</span>, <span class="hljs-number">0.7</span>);
+    shadow.position.copy(event.data.global);
+    world.addChild(shadow);
+});</code></pre><hr>
+<p>Main steps:</p>
+<ul class="list">
+<li>Initialisation: The <code>PIXI.shadows.init(application)</code> method can be used to set up your app properly. This does some fairly specific things however, which might not be correct in your usage case. So you can also decide to ignore the step and manually set up your application. Please check out what the init method does in <a href="https://github.com/TarVK/pixi-shadows/blob/master/src/shadows/index.js">this file</a>.</li>
+<li>Providing casters and overlays: A sprite can be marked to cast shadows (and not be rendered otherwise), by assigning it the group <code>PIXI.shadows.casterGroup</code>. Similarly, you can assign a sprite the group <code>PIXI.shadows.overlayGroup</code> making it render on top of shadows. By default shadow casters are also used as overlays.</li>
+<li>Providing shadows/lights: In order to now see anything actually being rendered, shadows must be added to the world. This can be done by instantiating the <code>PIXI.shadows.Shadow</code> object.</li>
+</ul>
+<h3 id="shadow-class"><a class="header-link" href="#shadow-class"></a>Shadow class</h3>
+<pre class="hljs"><code><span class="hljs-keyword">var</span> shadow = <span class="hljs-keyword">new</span> PIXI.shadows.Shadow(radius);
+world.addChild(shadow);</code></pre><p>Parameters:</p>
+<ul class="list">
+<li>range:        The radius of the lit area</li>
+<li>intensity:    The opacity of the lit area</li>
+<li>pointCount:   The number of points that cast light rays (With more points you get softer edges)</li>
+<li>scatterRange: The radius in which the light points are spread around</li>
+</ul>
+<p>Attributes:</p>
+<ul class="list">
+<li>All of the parameters above are also attributes</li>
+<li>radialResolution: The number of pixels to use for the shadow mapping, preferably at least 2 times the radius</li>
+<li>depthResolution: The number of depth steps to execute per pixel, preferably at least 1</li>
+<li>ignoreShadowCaster: A sprite that can be assigned to a light such that it won&#39;t cast shadows</li>
+</ul>
+<h3 id="filter-class"><a class="header-link" href="#filter-class"></a>Filter class</h3>
+<pre class="hljs"><code><span class="hljs-keyword">var</span> filter = PIXI.shadows.filter;</code></pre><p>Attributes:</p>
+<ul class="list">
+<li>width: The width of your application</li>
+<li>height: The height of your application</li>
+<li>useShadowCasterAsOverlay: Whether or not to simply use the sprites casting shadows as the overlays for the shadows (true by default)</li>
+<li>ambientLight: The opacity of the world where no shadows are present (the brightness of the shadows)</li>
+</ul>
+<hr>
+<h3 id="usage-with-pixi-lights"><a class="header-link" href="#usage-with-pixi-lights"></a>Usage with pixi-lights</h3>
+<p>This plugin can easily be used together with pixi-lights. Even more so, some structural choices were specifically made to support pixi-lights as this was the end goal.
+Here you can find a <a href="https://tarvk.github.io/pixi-shadows/build/demos/pixi-lights/">demo</a> with its corresponding <a href="https://github.com/TarVK/pixi-shadows/blob/master/src/demos/pixi-lights/index.js">source code</a>.</p>
+<h3 id="advanced-demo"><a class="header-link" href="#advanced-demo"></a>Advanced demo</h3>
+<p>In order to see all things that can be done with pixi-shadows, please have a look at the following <a href="https://tarvk.github.io/pixi-shadows/build/demos/advanced/">demo</a> and its corresponding <a href="https://github.com/TarVK/pixi-shadows/blob/master/src/demos/advanced/index.js">source code</a>.
+This demo can also be used to test performance (which is rather poor), and test how high numbers have to be crancked to achieve a desired effeect. </p>
+<h2 id="understanding-how-pixi-shadows-work"><a class="header-link" href="#understanding-how-pixi-shadows-work"></a>Understanding how pixi-shadows work</h2>
+<p>As mentioned before, pixi-shadows can most likely be improved in terms of performance. For that reason I think it is important to explain how it currently works, such that more experienced people might be able to give feedback. It might also be handy for people that need to customise the plugin if it doesn&#39;t fit their needs exactly.</p>
+<p>A <a href="https://tarvk.github.io/pixi-shadows/build/demos/system/">demo</a> is provided to show various components of the process, as well as its corresponding <a href="https://github.com/TarVK/pixi-shadows/blob/master/src/demos/system/index.js">source code</a>. I attempted to comment <a href="https://github.com/TarVK/pixi-shadows/tree/master/src/shadows">pixi-shadows&#39; source code</a> a little bit as well, so hopefully this in combination with the explanation below should be enough to understand how it operates. Additionally you can check <a href="https://github.com/mattdesl/lwjgl-basics/wiki/2D-Pixel-Perfect-Shadows">this detailed article</a> I found (but didn&#39;t use directly) that seems to have a very similar approach.</p>
+<p>Step by step description of what happens for each rendered frame:</p>
+<ol class="list">
+<li>Calculate transforms in the scene: As per usual, world transforms for all objects are calculated. But the Container mixin does one more thing during this step; it registers all special sprites and adds them to the shadow filter.</li>
+<li>Update the shadow filter which will perform several steps of its own:<ol class="list">
+<li>Render all shadow casters to a single texture.</li>
+<li>Render all shadow overlays to a signle texture.</li>
+<li>Render all shadows to their own texture:<ol class="list">
+<li>A shadow will first create a shadow map, as can be seen in the demo. This is a texture that stores the data of how far away a ray can be sent before it hits an object. To create this texture, it uses the shadow caster texture to look up pixel opacities. This texture can have several rows and columns, where every column indicates a certain angle, and every row indicates a single light point. The light points are spread around the center of the origin at a distance of the provided scatter range.</li>
+<li>Using this shadow map, a shadow can create a mask texture. For every pixel in the texture it will go through all light points. For all light points it will look up its angle towards said point, and check the distance to an object by checking the shadow map. If this distane is smaller than its own distance to the light point, it means the pixel is in the dark and should be black. In addition, every pixel will check the overlay texture. If it is opaque in said texture, it should be opaque in the mask, even if it is in a shadow.</li>
+</ol>
+</li>
+<li>Render all shadow masks to a single mask texture by adding up all colors.</li>
+</ol>
+</li>
+<li>Use the mask texture in the shadow filter to perform a mask on the container that the filter is added to. </li>
+</ol>
+<h2 id="demos-overview"><a class="header-link" href="#demos-overview"></a>Demos overview</h2>
+<ul class="list">
+<li><a href="https://tarvk.github.io/pixi-shadows/build/demos/basic/]">Basic demo</a></li>
+<li><a href="https://tarvk.github.io/pixi-shadows/build/demos/advanced/]">Advanced demo</a></li>
+<li><a href="https://tarvk.github.io/pixi-shadows/build/demos/pixi-lights/]">Pixi-lights demo</a></li>
+<li><a href="https://tarvk.github.io/pixi-shadows/build/demos/system/]">Process demo</a></li>
+</ul>
+<h2 id="using-the-development-environment"><a class="header-link" href="#using-the-development-environment"></a>Using the development environment</h2>
+<h3 id="setup"><a class="header-link" href="#setup"></a>Setup</h3>
+<ul class="list">
+<li>Install <a href="https://nodejs.org/en/">node.js</a></li>
+<li>Run the following command in the root of the project<pre class="hljs"><code>npm <span class="hljs-keyword">install</span></code></pre></li>
+</ul>
+<h3 id="running-demos-(through-which-you-can-test-the-shadows)"><a class="header-link" href="#running-demos-(through-which-you-can-test-the-shadows)"></a>Running demos (through which you can test the shadows)</h3>
+<pre class="hljs"><code>npm <span class="hljs-built_in">run</span> start:[demo <span class="hljs-built_in">name</span>]</code></pre><p>E.G.</p>
+<pre class="hljs"><code>npm <span class="hljs-keyword">run</span><span class="bash"> start:basic</span></code></pre><p>This will start a development server that will live update as you save changes to the source code.</p>
+<h3 id="building-code"><a class="header-link" href="#building-code"></a>Building code</h3>
+<h4 id="build-a-specific-demo"><a class="header-link" href="#build-a-specific-demo"></a>Build a specific demo</h4>
+<pre class="hljs"><code>npm <span class="hljs-built_in">run</span> build-demo:[demo <span class="hljs-built_in">name</span>]</code></pre><p>E.G.</p>
+<pre class="hljs"><code>npm <span class="hljs-keyword">run</span><span class="bash"> build-demo:basic</span></code></pre><h4 id="build-all-demos"><a class="header-link" href="#build-all-demos"></a>Build all demos</h4>
+<pre class="hljs"><code>npm <span class="hljs-keyword">run</span><span class="bash"> build:demos</span></code></pre><h4 id="build-pixi-shadows-itself"><a class="header-link" href="#build-pixi-shadows-itself"></a>Build pixi-shadows itself</h4>
+<pre class="hljs"><code>npm <span class="hljs-keyword">run</span><span class="bash"> build</span></code></pre><h2 id="todo"><a class="header-link" href="#todo"></a>TODO</h2>
+<ul class="list">
+<li>Add more shadow types<ul class="list">
+<li>spotlight shadow</li>
+<li>directional shadow</li>
+</ul>
+</li>
+<li>Improve performance</li>
+</ul>
+    </article>
+  </body>
+</html>

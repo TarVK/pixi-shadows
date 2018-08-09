@@ -44397,30 +44397,7 @@ var app = new PIXI.Application(width, height);
 document.body.appendChild(app.view);
 
 // Initialise the shadows plugin
-PIXI.shadows.init(app);
-
-// Make sure to overwrite the stage, otherwise pixi-layers won't work
-var stage = app.stage = new PIXI.display.Stage();
-
-// Create a container for all objects
-var world = new PIXI.Container();
-stage.addChild(world);
-
-// Set up the shadow layer
-stage.addChild(PIXI.shadows.shadowCasterLayer);
-stage.addChild(PIXI.shadows.shadowOverlayLayer);
-
-// Set up pixi light's layers
-var diffuseLayer = new PIXI.display.Layer(PIXI.lights.diffuseGroup);
-var diffuseBlackSprite = new PIXI.Sprite(diffuseLayer.getRenderTexture());
-diffuseBlackSprite.tint = 0;
-stage.addChild(diffuseLayer);
-stage.addChild(diffuseBlackSprite);
-stage.addChild(new PIXI.display.Layer(PIXI.lights.normalGroup));
-stage.addChild(new PIXI.display.Layer(PIXI.lights.lightGroup));
-
-// Add the shadow filter to the diffuse layer
-diffuseLayer.filters = [PIXI.shadows.shadowFilter];
+var world = PIXI.shadows.init(app, world);
 
 // A function to combine different assets if your world object, but give them a common transform by using pixi-layers
 // It is of course recommended to create a custom class for this, but this demo just shows the minimal steps required
@@ -44438,7 +44415,7 @@ function create3DSprite(diffuseTex, normalTex, shadowTexture) {
     if (shadowTexture) {
         // Only create a shadow casting object if a texture is provided
         var shadowCastingSprite = new PIXI.Sprite(shadowTexture);
-        shadowCastingSprite.parentGroup = PIXI.shadows.shadowCasterGroup;
+        shadowCastingSprite.parentGroup = PIXI.shadows.casterGroup;
         container.addChild(shadowCastingSprite);
     }
 
@@ -44462,7 +44439,7 @@ function createLight(radius, intensity, color) {
 world.addChild(new PIXI.lights.AmbientLight(null, 1));
 world.addChild(new PIXI.lights.DirectionalLight(null, 1, new PIXI.Point(0, 1))); // pixi-shadows doesn't support directional shadows yet
 // Can also set ambientLight for the shadow filter, making the shadow less dark: 
-// PIXI.shadows.shadowFilter.ambientLight = 0.4;
+// PIXI.shadows.filter.ambientLight = 0.4;
 
 // Create a light that casts shadows
 var light = createLight(700, 4, 0xffffff);
@@ -44499,7 +44476,7 @@ world.on('mousemove', function (event) {
 
 // Create a light point on click
 world.on('pointerdown', function (event) {
-    var light = createLight(300, 2, 0xffffff);
+    var light = createLight(450, 2, 0xffffff);
     light.position.copy(event.data.global);
     world.addChild(light);
 });
@@ -44540,16 +44517,15 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-/*
-    Attributes that can be altered:
-    -range [number]                 The radius of the lit area in pixels.
-    -intensity [number]             The opacity of the lit area. (may exceed 1)
-    -pointCount [number]            The number of points that makes up this light, for soft shadows. (More points = softer shadow edges + more intensive)
-    -scatterRange [number]          The radius at which the points of the light should be scattered. (Greater range = software shadow)
-    -radialResolution [number]      The number of rays to draw for the light. (Higher resolution = more precise edges + more intensive)
-    -depthResolution [number]       The of steps to take per pixel. (Higher resolution = more precise edges + more intensive)
-    -ignoreShadowCaster [Sprite]    A shadow caster to ignore while creating the shadows. (Can be used if sprite and light always overlap)
-*/
+/**
+ * @class
+ * @memberof PIXI.shadows
+ *
+ * @param range {number} The radius of the lit area in pixels.
+ * @param [intensity=1] {number} The opacity of the lit area.
+ * @param [pointCount=20] {number} The number of points that makes up this light.
+ * @param [scatterRange=15] {number} The radius at which the points of the light should be scattered.
+ */
 
 var Shadow = function (_PIXI$Sprite) {
     _inherits(Shadow, _PIXI$Sprite);
@@ -44634,13 +44610,20 @@ var Shadow = function (_PIXI$Sprite) {
         }
 
         // Attribute setters
+        /**
+         * @type {number} The radius of the lit area in pixels.
+         */
 
     }, {
         key: 'range',
         set: function set(range) {
             this._range = range;
             this.__updateTextureSize();
-        },
+        }
+        /**
+         * @type {number} The number of points that makes up this light, for soft shadows. (More points = softer shadow edges + more intensive).
+         */
+        ,
 
 
         // Attribute getters
@@ -44652,7 +44635,11 @@ var Shadow = function (_PIXI$Sprite) {
         set: function set(count) {
             this._pointCount = count;
             this.__createShadowMapSources();
-        },
+        }
+        /**
+         * @type {number} The opacity of the lit area. (may exceed 1).
+         */
+        ,
         get: function get() {
             return this._pointCount;
         }
@@ -44660,7 +44647,11 @@ var Shadow = function (_PIXI$Sprite) {
         key: 'scatterRange',
         set: function set(range) {
             this._scatterRange = range;
-        },
+        }
+        /**
+         * @type {number} The radius at which the points of the light should be scattered. (Greater range = software shadow).
+         */
+        ,
         get: function get() {
             return this._scatterRange;
         }
@@ -44668,7 +44659,11 @@ var Shadow = function (_PIXI$Sprite) {
         key: 'intensity',
         set: function set(intensity) {
             this._intensity = intensity;
-        },
+        }
+        /**
+         * @type {number} The number of rays to draw for the light. (Higher resolution = more precise edges + more intensive).
+         */
+        ,
         get: function get() {
             return this._intensity;
         }
@@ -44677,7 +44672,11 @@ var Shadow = function (_PIXI$Sprite) {
         set: function set(resolution) {
             this._radialResolution = resolution;
             this.__createShadowMapSources();
-        },
+        }
+        /**
+         * @type {number} The of steps to take per pixel. (Higher resolution = more precise edges + more intensive).
+         */
+        ,
         get: function get() {
             return this._radialResolution;
         }
@@ -44685,7 +44684,11 @@ var Shadow = function (_PIXI$Sprite) {
         key: 'depthResolution',
         set: function set(resolution) {
             this._depthResolution = resolution;
-        },
+        }
+        /**
+         * @type {PIXI.Sprite} A shadow caster to ignore while creating the shadows. (Can be used if sprite and light always overlap).
+         */
+        ,
         get: function get() {
             return this._depthResolution;
         }
@@ -44895,12 +44898,19 @@ var ShadowFilter = function (_PIXI$Filter) {
         }
 
         // Attribute setters
+        /**
+         * @type {number} The brightness that unlit areas of the world should have
+         */
 
     }, {
         key: "ambientLight",
         set: function set(frac) {
             this.uniforms.ambientLight = frac;
-        },
+        }
+        /**
+         * @type {number} The width of your application
+         */
+        ,
 
 
         // Attribute getters
@@ -44916,7 +44926,11 @@ var ShadowFilter = function (_PIXI$Filter) {
             this.__createOverlaySources();
             this.__createCasterSources();
             this.__createMaskSources();
-        },
+        }
+        /**
+         * @type {number} The height of your application
+         */
+        ,
         get: function get() {
             return this._width;
         }
@@ -44929,7 +44943,11 @@ var ShadowFilter = function (_PIXI$Filter) {
             this.__createOverlaySources();
             this.__createCasterSources();
             this.__createMaskSources();
-        },
+        }
+        /**
+         * @type {boolean} Whether or not to use shadow casters as shadow overlays as well 
+         */
+        ,
         get: function get() {
             return this._height;
         }
@@ -45164,25 +45182,51 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 PIXI.shadows = {
         init: function init(application) {
                 // The objects that will cast shadows
-                this.shadowCasterGroup = new PIXI.display.Group();
-                this.shadowCasterLayer = new PIXI.display.Layer(this.shadowCasterGroup);
+                this.casterGroup = new PIXI.display.Group();
+                this.casterLayer = new PIXI.display.Layer(this.casterGroup);
 
                 // The objects that will remain ontop of the shadows
-                this.shadowOverlayGroup = new PIXI.display.Group();
-                this.shadowOverlayLayer = new PIXI.display.Layer(this.shadowOverlayGroup);
+                this.overlayGroup = new PIXI.display.Group();
+                this.overlayLayer = new PIXI.display.Layer(this.overlayGroup);
 
                 // Make sure the caster objects aren't actually visible
-                this.shadowCasterLayer.renderWebGL = function () {};
-                this.shadowOverlayLayer.renderWebGL = function () {};
+                this.casterLayer.renderWebGL = function () {};
+                this.overlayLayer.renderWebGL = function () {};
 
                 // Create the shadow filter
-                this.shadowFilter = new _ShadowFilter2.default(application.renderer.width, application.renderer.height);
+                this.filter = new _ShadowFilter2.default(application.renderer.width, application.renderer.height);
 
                 // Set up the container mixin so that it tells the filter about the available shadows and objects
-                (0, _Container2.default)(this.shadowCasterGroup, this.shadowOverlayGroup, this.shadowFilter);
+                (0, _Container2.default)(this.casterGroup, this.overlayGroup, this.filter);
 
                 // Overwrite the application render method
-                (0, _Application2.default)(application, this.shadowFilter);
+                (0, _Application2.default)(application, this.filter);
+
+                // If a container is specified, set up the filter
+                var container = new PIXI.Container();
+                application.stage.addChild(container);
+
+                // Set up the shadow layers
+                application.stage.addChild(this.casterLayer, this.overlayLayer);
+
+                // Set up pixi lights if available
+                if (PIXI.lights) {
+                        // Set up pixi-light's layers
+                        var diffuseLayer = new PIXI.display.Layer(PIXI.lights.diffuseGroup);
+                        var diffuseBlackSprite = new PIXI.Sprite(diffuseLayer.getRenderTexture());
+                        diffuseBlackSprite.tint = 0;
+                        application.stage.addChild(diffuseLayer, diffuseBlackSprite, new PIXI.display.Layer(PIXI.lights.normalGroup), new PIXI.display.Layer(PIXI.lights.lightGroup));
+
+                        // Add the shadow filter to the diffuse layer
+                        diffuseLayer.filters = [this.filter];
+                } else {
+
+                        // Add the shadow filter to the container
+                        container.filters = [this.filter];
+                }
+
+                // Rreturn the container to use
+                return container;
         },
         Shadow: _Shadow2.default,
 
@@ -45216,6 +45260,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = augment;
 function augment(application, shadowFilter) {
+    // Replace the stage with a layered stage
+    application.stage = new PIXI.display.Stage();
+
     // Remove the current render fucntion
     application.ticker.remove(application.render, application);
 

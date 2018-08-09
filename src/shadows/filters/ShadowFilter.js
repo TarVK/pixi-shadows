@@ -158,9 +158,15 @@ export default class ShadowFilter extends PIXI.Filter{
     }
 
     // Attribute setters
+    /**
+     * @type {number} The brightness that unlit areas of the world should have
+     */
     set ambientLight(frac){
         this.uniforms.ambientLight = frac;
     }
+    /**
+     * @type {number} The width of your application
+     */
     set width(width){
         this._width = width;
 
@@ -169,6 +175,9 @@ export default class ShadowFilter extends PIXI.Filter{
         this.__createCasterSources();
         this.__createMaskSources();
     }
+    /**
+     * @type {number} The height of your application
+     */
     set height(height){
         this._height = height;
 
@@ -177,6 +186,9 @@ export default class ShadowFilter extends PIXI.Filter{
         this.__createCasterSources();
         this.__createMaskSources();
     }
+    /**
+     * @type {boolean} Whether or not to use shadow casters as shadow overlays as well 
+     */
     set useShadowCasterAsOverlay(val){
         this._useShadowCastersAsOverlay = val;
     }

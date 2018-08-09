@@ -1,16 +1,15 @@
 import ShadowMaskFilter from './filters/ShadowMaskFilter';
 import ShadowMapFilter from './filters/ShadowMapFilter';
 
-/*
-    Attributes that can be altered:
-    -range [number]                 The radius of the lit area in pixels.
-    -intensity [number]             The opacity of the lit area. (may exceed 1)
-    -pointCount [number]            The number of points that makes up this light, for soft shadows. (More points = softer shadow edges + more intensive)
-    -scatterRange [number]          The radius at which the points of the light should be scattered. (Greater range = software shadow)
-    -radialResolution [number]      The number of rays to draw for the light. (Higher resolution = more precise edges + more intensive)
-    -depthResolution [number]       The of steps to take per pixel. (Higher resolution = more precise edges + more intensive)
-    -ignoreShadowCaster [Sprite]    A shadow caster to ignore while creating the shadows. (Can be used if sprite and light always overlap)
-*/
+/**
+ * @class
+ * @memberof PIXI.shadows
+ *
+ * @param range {number} The radius of the lit area in pixels.
+ * @param [intensity=1] {number} The opacity of the lit area.
+ * @param [pointCount=20] {number} The number of points that makes up this light.
+ * @param [scatterRange=15] {number} The radius at which the points of the light should be scattered.
+ */
 
 export default class Shadow extends PIXI.Sprite{
     constructor(range, intensity, pointCount, scatterRange){
@@ -75,27 +74,48 @@ export default class Shadow extends PIXI.Sprite{
     }
 
     // Attribute setters
+    /**
+     * @type {number} The radius of the lit area in pixels.
+     */
     set range(range){
         this._range = range;
         this.__updateTextureSize();
     }
+    /**
+     * @type {number} The number of points that makes up this light, for soft shadows. (More points = softer shadow edges + more intensive).
+     */
     set pointCount(count){
         this._pointCount = count;
         this.__createShadowMapSources();
     }
+    /**
+     * @type {number} The opacity of the lit area. (may exceed 1).
+     */
     set scatterRange(range){
         this._scatterRange = range;
     }
+    /**
+     * @type {number} The radius at which the points of the light should be scattered. (Greater range = software shadow).
+     */
     set intensity(intensity){
         this._intensity = intensity;
     }
+    /**
+     * @type {number} The number of rays to draw for the light. (Higher resolution = more precise edges + more intensive).
+     */
     set radialResolution(resolution){
         this._radialResolution = resolution;
         this.__createShadowMapSources();
     }
+    /**
+     * @type {number} The of steps to take per pixel. (Higher resolution = more precise edges + more intensive).
+     */
     set depthResolution(resolution){
         this._depthResolution = resolution;
     }
+    /**
+     * @type {PIXI.Sprite} A shadow caster to ignore while creating the shadows. (Can be used if sprite and light always overlap).
+     */
     set ignoreShadowCaster(sprite){
         this._ignoreShadowCaster = sprite;
     }
