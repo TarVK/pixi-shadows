@@ -190,3 +190,13 @@ revealGUI.add(reveal, "overlays").onChange(function(value){
     if(value)   app.stage.addChild(PIXI.shadows.filter._shadowOverlayResultSprite);
     else        app.stage.removeChild(PIXI.shadows.filter._shadowOverlayResultSprite);
 });
+
+
+// Testing stuff
+var extract = new PIXI.extract.webgl(app.renderer);
+app.ticker.add(function(){
+    // console.log(PIXI.shadows.filter._maskResultTexture);
+    // var res = extract.pixels(PIXI.shadows.filter._maskResultTexture.baseTexture);
+    window.res = app.renderer.extract.pixels(PIXI.shadows.filter._maskResultSprite);
+    console.log("detect");
+});

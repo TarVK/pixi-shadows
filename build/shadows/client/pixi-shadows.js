@@ -759,7 +759,7 @@ exports.default = ShadowMaskFilter;
 
 
 Object.defineProperty(exports, "__esModule", {
-        value: true
+  value: true
 });
 
 var _Container = __webpack_require__(/*! ./mixins/Container */ "./src/shadows/mixins/Container.js");
@@ -793,66 +793,68 @@ var _Shadow2 = _interopRequireDefault(_Shadow);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 PIXI.shadows = {
-        init: function init(application) {
-                // The objects that will cast shadows
-                this.casterGroup = new PIXI.display.Group();
-                this.casterLayer = new PIXI.display.Layer(this.casterGroup);
+  init: function init(application) {
+    // The objects that will cast shadows
+    this.casterGroup = new PIXI.display.Group();
+    this.casterLayer = new PIXI.display.Layer(this.casterGroup);
 
-                // The objects that will remain ontop of the shadows
-                this.overlayGroup = new PIXI.display.Group();
-                this.overlayLayer = new PIXI.display.Layer(this.overlayGroup);
+    // The objects that will remain ontop of the shadows
+    this.overlayGroup = new PIXI.display.Group();
+    this.overlayLayer = new PIXI.display.Layer(this.overlayGroup);
 
-                // Make sure the caster objects aren't actually visible
-                this.casterLayer.renderWebGL = function () {};
-                this.overlayLayer.renderWebGL = function () {};
+    // Make sure the caster objects aren't actually visible
+    this.casterLayer.renderWebGL = function () {};
+    this.overlayLayer.renderWebGL = function () {};
 
-                // Create the shadow filter
-                this.filter = new _ShadowFilter2.default(application.renderer.width, application.renderer.height);
+    // Create the shadow filter
+    this.filter = new _ShadowFilter2.default(application.renderer.width, application.renderer.height);
 
-                // Set up the container mixin so that it tells the filter about the available shadows and objects
-                (0, _Container2.default)(this.casterGroup, this.overlayGroup, this.filter);
+    // Set up the container mixin so that it tells the filter about the available shadows and objects
+    (0, _Container2.default)(this.casterGroup, this.overlayGroup, this.filter);
 
-                // Overwrite the application render method
-                (0, _Application2.default)(application, this.filter);
+    // Overwrite the application render method
+    (0, _Application2.default)(application, this.filter);
 
-                // If a container is specified, set up the filter
-                var container = new PIXI.Container();
-                application.stage.addChild(container);
+    // If a container is specified, set up the filter
+    var container = new PIXI.Container();
+    application.stage.addChild(container);
 
-                // Set up the shadow layers
-                application.stage.addChild(this.casterLayer, this.overlayLayer);
+    // Set up the shadow layers
+    application.stage.addChild(this.casterLayer, this.overlayLayer);
 
-                // Set up pixi lights if available
-                if (PIXI.lights) {
-                        // Set up pixi-light's layers
-                        var diffuseLayer = new PIXI.display.Layer(PIXI.lights.diffuseGroup);
-                        var diffuseBlackSprite = new PIXI.Sprite(diffuseLayer.getRenderTexture());
-                        diffuseBlackSprite.tint = 0;
-                        application.stage.addChild(diffuseLayer, diffuseBlackSprite, new PIXI.display.Layer(PIXI.lights.normalGroup), new PIXI.display.Layer(PIXI.lights.lightGroup));
+    // Set up pixi lights if available
+    if (PIXI.lights) {
+      // Set up pixi-light's layers
+      this.diffuseLayer = new PIXI.display.Layer(PIXI.lights.diffuseGroup);
+      this.normalLayer = new PIXI.display.Layer(PIXI.lights.normalGroup);
+      this.lightLayer = new PIXI.display.Layer(PIXI.lights.lightGroup);
+      var diffuseBlackSprite = new PIXI.Sprite(this.diffuseLayer.getRenderTexture());
+      diffuseBlackSprite.tint = 0;
 
-                        // Add the shadow filter to the diffuse layer
-                        diffuseLayer.filters = [this.filter];
-                } else {
+      application.stage.addChild(this.diffuseLayer, diffuseBlackSprite, this.normalLayer, this.lightLayer);
 
-                        // Add the shadow filter to the container
-                        container.filters = [this.filter];
-                }
+      // Add the shadow filter to the diffuse layer
+      this.diffuseLayer.filters = [this.filter];
+    } else {
+      // Add the shadow filter to the container
+      container.filters = [this.filter];
+    }
 
-                // Rreturn the container to use
-                return container;
-        },
-        Shadow: _Shadow2.default,
+    // Rreturn the container to use
+    return container;
+  },
+  Shadow: _Shadow2.default,
 
-        // Making all classes available for if you want to augmnent this code without going into the source and properly building things afterwards
-        __classes: {
-                ContainerSetup: _Container2.default,
-                ApplicationSetup: _Application2.default,
-                ShadowFilter: _ShadowFilter2.default,
-                ShadowMapFilter: _ShadowMapFilter2.default,
-                ShadowMaskFilter: _ShadowMaskFilter2.default,
-                FilterFuncs: _FilterFuncs2.default,
-                Shadow: _Shadow2.default
-        }
+  // Making all classes available for if you want to augmnent this code without going into the source and properly building things afterwards
+  __classes: {
+    ContainerSetup: _Container2.default,
+    ApplicationSetup: _Application2.default,
+    ShadowFilter: _ShadowFilter2.default,
+    ShadowMapFilter: _ShadowMapFilter2.default,
+    ShadowMaskFilter: _ShadowMaskFilter2.default,
+    FilterFuncs: _FilterFuncs2.default,
+    Shadow: _Shadow2.default
+  }
 };
 exports.default = PIXI.shadows;
 
