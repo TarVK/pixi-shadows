@@ -44372,7 +44372,7 @@ function createShadowSprite(texture, shadowTexture) {
     return container;
 }
 
-// Can set ambientLight for the shadow filter, making the shadow less dark: 
+// Can set ambientLight for the shadow filter, making the shadow less dark:
 // PIXI.shadows.filter.ambientLight = 0.4;
 
 // Create a light that casts shadows
@@ -44381,12 +44381,12 @@ shadow.position.set(450, 150);
 world.addChild(shadow);
 
 // Create a background (that doesn't cast shadows)
-var bgTexture = PIXI.Texture.fromImage('assets/background.jpg');
+var bgTexture = PIXI.Texture.fromImage("assets/background.jpg");
 var background = new PIXI.Sprite(bgTexture);
 world.addChild(background);
 
 // Create some shadow casting demons
-var demonTexture = PIXI.Texture.fromImage('assets/flameDemon.png');
+var demonTexture = PIXI.Texture.fromImage("assets/flameDemon.png");
 demonTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST; //For pixelated scaling
 
 var demon1 = createShadowSprite(demonTexture, demonTexture);
@@ -44406,12 +44406,12 @@ world.addChild(demon3);
 
 // Make the light track your mouse
 world.interactive = true;
-world.on('mousemove', function (event) {
+world.on("mousemove", function (event) {
     shadow.position.copy(event.data.global);
 });
 
 // Create a light point on click
-world.on('pointerdown', function (event) {
+world.on("pointerdown", function (event) {
     var shadow = new PIXI.shadows.Shadow(700, 0.7);
     shadow.position.copy(event.data.global);
     world.addChild(shadow);
@@ -44477,6 +44477,7 @@ var Shadow = function (_PIXI$Sprite) {
         _this._intensity = intensity || 1;
         _this._radialResolution = 800;
         _this._depthResolution = 1; //per screen pixel
+        _this._darkenOverlay = false;
         _this.anchor.set(0.5);
 
         _this._ignoreShadowCaster;
@@ -44488,7 +44489,7 @@ var Shadow = function (_PIXI$Sprite) {
 
 
     _createClass(Shadow, [{
-        key: '__updateTextureSize',
+        key: "__updateTextureSize",
         value: function __updateTextureSize() {
             this.texture.destroy();
             this.texture = PIXI.RenderTexture.create(this._range * 2, this._range * 2);
@@ -44496,13 +44497,13 @@ var Shadow = function (_PIXI$Sprite) {
         // Create the resources that create the shadow map
 
     }, {
-        key: '__createShadowMapSources',
+        key: "__createShadowMapSources",
         value: function __createShadowMapSources() {
             if (this._shadowMapSprite) this._shadowMapSprite.destroy();
             if (this._shadowMapResultSprite) this._shadowMapResultSprite.destroy();
             if (this._shadowMapResultTexture) this._shadowMapResultTexture.destroy();
 
-            // A blank texture/sprite to apply the filter to 
+            // A blank texture/sprite to apply the filter to
             this._shadowMapResultTexture = PIXI.RenderTexture.create(this._radialResolution, this._pointCount);
             this._shadowMapResultTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
             this._shadowMapSprite = new PIXI.Sprite(this._shadowMapResultTexture);
@@ -44519,26 +44520,26 @@ var Shadow = function (_PIXI$Sprite) {
         // Properly dispose all the created resources
 
     }, {
-        key: 'destroy',
+        key: "destroy",
         value: function destroy() {
             if (this._shadowMapSprite) this._shadowMapSprite.destroy();
             if (this._shadowMapResultSprite) this._shadowMapResultSprite.destroy();
             if (this._shadowMapResultTexture) this._shadowMapResultTexture.destroy();
             this.texture.destroy();
-            return _get(Shadow.prototype.__proto__ || Object.getPrototypeOf(Shadow.prototype), 'destroy', this).call(this);
+            return _get(Shadow.prototype.__proto__ || Object.getPrototypeOf(Shadow.prototype), "destroy", this).call(this);
         }
         // Don't render this sprite unless we are in the dedicated render step called by the shadow filter
 
     }, {
-        key: 'renderAdvancedWebGL',
+        key: "renderAdvancedWebGL",
         value: function renderAdvancedWebGL(renderer) {
-            if (this.renderStep) _get(Shadow.prototype.__proto__ || Object.getPrototypeOf(Shadow.prototype), 'renderAdvancedWebGL', this).call(this, renderer);
+            if (this.renderStep) _get(Shadow.prototype.__proto__ || Object.getPrototypeOf(Shadow.prototype), "renderAdvancedWebGL", this).call(this, renderer);
         }
 
         // Update the map to create the mask from
 
     }, {
-        key: 'update',
+        key: "update",
         value: function update(renderer, shadowCasterSprite, shadowOverlaySprite) {
             this._shadowCasterSprite = shadowCasterSprite;
             this._shadowOverlaySprite = shadowOverlaySprite;
@@ -44551,7 +44552,7 @@ var Shadow = function (_PIXI$Sprite) {
          */
 
     }, {
-        key: 'range',
+        key: "range",
         set: function set(range) {
             this._range = range;
             this.__updateTextureSize();
@@ -44567,7 +44568,7 @@ var Shadow = function (_PIXI$Sprite) {
             return this._range;
         }
     }, {
-        key: 'pointCount',
+        key: "pointCount",
         set: function set(count) {
             this._pointCount = count;
             this.__createShadowMapSources();
@@ -44580,7 +44581,7 @@ var Shadow = function (_PIXI$Sprite) {
             return this._pointCount;
         }
     }, {
-        key: 'scatterRange',
+        key: "scatterRange",
         set: function set(range) {
             this._scatterRange = range;
         }
@@ -44592,7 +44593,7 @@ var Shadow = function (_PIXI$Sprite) {
             return this._scatterRange;
         }
     }, {
-        key: 'intensity',
+        key: "intensity",
         set: function set(intensity) {
             this._intensity = intensity;
         }
@@ -44604,7 +44605,7 @@ var Shadow = function (_PIXI$Sprite) {
             return this._intensity;
         }
     }, {
-        key: 'radialResolution',
+        key: "radialResolution",
         set: function set(resolution) {
             this._radialResolution = resolution;
             this.__createShadowMapSources();
@@ -44617,7 +44618,7 @@ var Shadow = function (_PIXI$Sprite) {
             return this._radialResolution;
         }
     }, {
-        key: 'depthResolution',
+        key: "depthResolution",
         set: function set(resolution) {
             this._depthResolution = resolution;
         }
@@ -44629,12 +44630,24 @@ var Shadow = function (_PIXI$Sprite) {
             return this._depthResolution;
         }
     }, {
-        key: 'ignoreShadowCaster',
+        key: "ignoreShadowCaster",
         set: function set(sprite) {
             this._ignoreShadowCaster = sprite;
-        },
+        }
+        /**
+         * @type {boolean} Whther or not overlays in shadows should become darker (can create odd artifacts, is very experimental/unfinished)
+         */
+        ,
         get: function get() {
             return this._ignoreShadowCaster;
+        }
+    }, {
+        key: "darkenOverlay",
+        set: function set(bool) {
+            this._darkenOverlay = bool;
+        },
+        get: function get() {
+            return this._darkenOverlay;
         }
     }]);
 
@@ -44928,7 +44941,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var maxDepthResolution = '2000.0';
+var maxDepthResolution = "2000.0";
 
 var ShadowMapFilter = function (_PIXI$Filter) {
     _inherits(ShadowMapFilter, _PIXI$Filter);
@@ -44936,7 +44949,7 @@ var ShadowMapFilter = function (_PIXI$Filter) {
     function ShadowMapFilter(shadow) {
         _classCallCheck(this, ShadowMapFilter);
 
-        var _this = _possibleConstructorReturn(this, (ShadowMapFilter.__proto__ || Object.getPrototypeOf(ShadowMapFilter)).call(this, '\n            attribute vec2 aVertexPosition;\n            attribute vec2 aTextureCoord;\n            \n            uniform mat3 projectionMatrix;\n            uniform mat3 filterMatrix;\n            \n            varying vec2 vTextureCoord;\n            varying vec2 vFilterCoord;\n            \n            void main(void){\n                gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);\n                vTextureCoord = aTextureCoord;\n            }\n        ', '\n            varying vec2 vMaskCoord;\n            varying vec2 vTextureCoord;\n            uniform vec4 filterArea;\n            \n            uniform sampler2D shadowCasterSampler;\n            uniform vec2 shadowCasterSpriteDimensions;\n\n            uniform bool hasIgnoreShadowCaster;\n            uniform sampler2D ignoreShadowCasterSampler;\n            uniform mat3 ignoreShadowCasterMatrix;\n            uniform vec2 ignoreShadowCasterDimensions;\n\n            uniform float lightRange;\n            uniform float lightScatterRange;\n            uniform vec2 lightLoc;\n\n            uniform float depthResolution;\n\n            uniform vec2 dimensions;\n\n            ' + _FilterFuncs.filterFuncs + '\n            \n            void main(void){\n                float pi = 3.141592653589793238462643;\n                \n                // Cap the depthResolution (as I expect performance loss by having a big value, but I am not sure)\n                float depthRes = min(' + maxDepthResolution + ', depthResolution);\n\n                // The current coordinate on the texutre measured in pixels, as well as a fraction\n                vec2 pixelCoord = vTextureCoord * filterArea.xy;\n                vec2 normalizedCoord = pixelCoord / dimensions;\n                \n                // Extract the components of the normalized coordinate\n                float x = normalizedCoord.x;\n                float y = normalizedCoord.y;\n\n                // Calculate the offset of the lightPoint we are currently at\n                float offsetAngle = 2.0 * pi * y;\n                vec2 offset = vec2(cos(offsetAngle), sin(offsetAngle)) * lightScatterRange;\n\n                // Calculate the angle at which we are ray tracing\n                float angle = x * pi * 2.0;\n\n                // The distance at which we hit an object\n                float hitDistancePer = 1.0;\n\n                // Increase the distance until we hit an object or reach the maximum value\n                for(float dist=0.0; dist < ' + maxDepthResolution + '; dist+=1.0){\n                    if(dist > depthRes) break;\n                    \n                    // Calculate the actual distance in pixel units, and use it to calculate the pixel coordinate to inspect\n                    float distance = dist / depthRes * lightRange;\n                    vec2 coord = lightLoc + offset + vec2(cos(angle), sin(angle)) * distance;\n                \n                    // Extract the pixel and check if it is opaque\n                    float opacity = texture2D(shadowCasterSampler, coord / shadowCasterSpriteDimensions).a;\n                    if(opacity > 0.5){\n                        // Check if it isn\'t hitting something that should be ignore\n                        if(hasIgnoreShadowCaster){ \n                            vec2 l = (ignoreShadowCasterMatrix * vec3(coord, 1.0)).xy / ignoreShadowCasterDimensions;\n                            if(l.x >= -0.01 && l.x <= 1.01 && l.y >= -0.01 && l.y <= 1.01){\n                                // If the pixel at the ignoreShadowCaster is opaque here, skip this pixel\n                                if(opacity > 0.5){\n                                    continue;\n                                }\n                            }\n                        }\n\n                        // Calculate the percentage at which this hit occurred, and stop the loop\n                        hitDistancePer = distance / lightRange;\n                        break;\n                    }\n                }\n\n                // Express the distance as a color in the map\n                gl_FragColor = floatToColor(hitDistancePer * 100000.0);\n            }\n        '));
+        var _this = _possibleConstructorReturn(this, (ShadowMapFilter.__proto__ || Object.getPrototypeOf(ShadowMapFilter)).call(this, "\n            attribute vec2 aVertexPosition;\n            attribute vec2 aTextureCoord;\n            \n            uniform mat3 projectionMatrix;\n            uniform mat3 filterMatrix;\n            \n            varying vec2 vTextureCoord;\n            varying vec2 vFilterCoord;\n            \n            void main(void){\n                gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);\n                vTextureCoord = aTextureCoord;\n            }\n        ", "\n            varying vec2 vMaskCoord;\n            varying vec2 vTextureCoord;\n            uniform vec4 filterArea;\n            \n            uniform sampler2D shadowCasterSampler;\n            uniform vec2 shadowCasterSpriteDimensions;\n\n            uniform bool hasIgnoreShadowCaster;\n            uniform sampler2D ignoreShadowCasterSampler;\n            uniform mat3 ignoreShadowCasterMatrix;\n            uniform vec2 ignoreShadowCasterDimensions;\n\n            uniform float lightRange;\n            uniform float lightScatterRange;\n            uniform vec2 lightLoc;\n\n            uniform float depthResolution;\n            uniform bool darkenOverlay;\n\n            uniform vec2 dimensions;\n\n            " + _FilterFuncs.filterFuncs + "\n            \n            void main(void){\n                float pi = 3.141592653589793238462643;\n                \n                // Cap the depthResolution (as I expect performance loss by having a big value, but I am not sure)\n                float depthRes = min(" + maxDepthResolution + ", depthResolution);\n\n                // The current coordinate on the texutre measured in pixels, as well as a fraction\n                vec2 pixelCoord = vTextureCoord * filterArea.xy;\n                vec2 normalizedCoord = pixelCoord / dimensions;\n                \n                // Extract the components of the normalized coordinate\n                float x = normalizedCoord.x;\n                float y = normalizedCoord.y;\n\n                // Calculate the offset of the lightPoint we are currently at\n                float offsetAngle = 2.0 * pi * y;\n                vec2 offset = vec2(cos(offsetAngle), sin(offsetAngle)) * lightScatterRange;\n\n                // Calculate the angle at which we are ray tracing\n                float angle = x * pi * 2.0;\n\n                // The distance at which we hit an object\n                float hitDistancePer = 1.0;\n\n                // Increase the distance until we hit an object or reach the maximum value\n                bool reached = false;\n                for(float dist=0.0; dist < " + maxDepthResolution + "; dist+=1.0){\n                    if(dist > depthRes) break;\n                    \n                    // Calculate the actual distance in pixel units, and use it to calculate the pixel coordinate to inspect\n                    float distance = dist / depthRes * lightRange;\n                    vec2 coord = lightLoc + offset + vec2(cos(angle), sin(angle)) * distance;\n                \n                    // Extract the pixel and check if it is opaque\n                    float opacity = texture2D(shadowCasterSampler, coord / shadowCasterSpriteDimensions).a;\n                    if((opacity > 0.0 && darkenOverlay) || opacity > 0.5){\n                        // Check if it isn't hitting something that should be ignore\n                        if(hasIgnoreShadowCaster){ \n                            vec2 l = (ignoreShadowCasterMatrix * vec3(coord, 1.0)).xy / ignoreShadowCasterDimensions;\n                            if(l.x >= -0.01 && l.x <= 1.01 && l.y >= -0.01 && l.y <= 1.01){\n                                // If the pixel at the ignoreShadowCaster is opaque here, skip this pixel\n                                if(opacity > 0.0){\n                                    continue;\n                                }\n                            }\n                        }\n\n                        // Calculate the percentage at which this hit occurred, and stop the loop\n                        if(!darkenOverlay){\n                            hitDistancePer = distance / lightRange;\n                            break;\n                        }\n                        reached = true;\n                    }else if(reached){\n                        hitDistancePer = (distance - 1.0) / lightRange;\n                        break;\n                    }\n                }\n\n                // Express the distance as a color in the map\n                gl_FragColor = floatToColor(hitDistancePer * 100000.0);\n            }\n        "));
 
         _this.uniforms.lightPointCount = shadow.pointCount;
 
@@ -44951,8 +44964,11 @@ var ShadowMapFilter = function (_PIXI$Filter) {
     }
 
     _createClass(ShadowMapFilter, [{
-        key: 'apply',
+        key: "apply",
         value: function apply(filterManager, input, output) {
+            // Decide whether or not to darken the overlays
+            this.uniforms.darkenOverlay = this.shadow._darkenOverlay;
+
             // Attach the object sampler
             var sc = this.shadow._shadowCasterSprite;
             this.uniforms.shadowCasterSpriteDimensions = [sc.width, sc.height];
@@ -45022,7 +45038,7 @@ var ShadowMaskFilter = function (_PIXI$Filter) {
     function ShadowMaskFilter(shadow) {
         _classCallCheck(this, ShadowMaskFilter);
 
-        var _this = _possibleConstructorReturn(this, (ShadowMaskFilter.__proto__ || Object.getPrototypeOf(ShadowMaskFilter)).call(this, '\n            attribute vec2 aVertexPosition;\n            attribute vec2 aTextureCoord;\n            \n            uniform mat3 projectionMatrix;\n            uniform mat3 overlayMatrix;\n            uniform mat3 filterMatrix;\n            \n            varying vec2 vTextureCoord;\n            varying vec2 vOverlayCoord;\n            varying vec2 vFilterCoord;\n            \n            void main(void){\n                gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);\n                vTextureCoord = aTextureCoord;\n                vOverlayCoord = (overlayMatrix * vec3(aTextureCoord, 1.0) ).xy;\n            }\n        ', '\n            varying vec2 vOverlayCoord;\n            varying vec2 vTextureCoord;\n            uniform vec4 filterArea;\n            \n            uniform sampler2D shadowOverlaySampler;\n\n            uniform vec2 dimensions;\n\n            uniform sampler2D shadowSampler;\n\n            uniform float lightPointCount;\n            uniform float lightRange;\n            uniform float lightScatterRange;\n            uniform float lightIntensity;\n\n            ' + _FilterFuncs.filterFuncs + '\n            \n            void main(void){\n                float pi = 3.141592653589793238462643;\n                \n                // The current coordinate on the texture measured in pixels\n                vec2 pixelCoord = vTextureCoord * filterArea.xy;\n\n                // The distance delta relative to the center\n                vec2 lightDelta = pixelCoord - dimensions / 2.0;\n                float distance = sqrt(lightDelta.x * lightDelta.x + lightDelta.y * lightDelta.y);\n                if (distance > lightRange) return;\n\n                // The final intensity of the light at this pixel\n                float totalIntensity = 0.0;\n\n                // The intensity of the pixel in the overlay map at this pixel\n                vec4 overlayPixel = texture2D(shadowOverlaySampler, vOverlayCoord);\n\n                // Go through all light points (at most 1000) to add them to the intensity\n                for(float lightIndex=0.0; lightIndex<1000.0; lightIndex++){\n                    if (lightIndex >= lightPointCount) break; // Stop the loop if we went over the pointCount\n\n                    // Calculate the offset of this lightPoint, relative the the center of the light\n                    float lightIndexFrac = (lightIndex + 0.5) / lightPointCount;\n                    float offsetAngle = 2.0 * pi * lightIndexFrac;\n                    vec2 offset = vec2(cos(offsetAngle), sin(offsetAngle)) * lightScatterRange;\n\n                    // Calculate the location of this pixel relative to the lightPoint, and check the depth map\n                    vec2 pointDelta = lightDelta - offset;\n                    float pointDistance = sqrt(pointDelta.x * pointDelta.x + pointDelta.y * pointDelta.y);\n                    float angle = mod(atan(pointDelta.y, pointDelta.x) + 2.0 * pi, 2.0 * pi);\n                    vec4 depthPixel = texture2D(shadowSampler, vec2(angle / (2.0 * pi), lightIndexFrac));\n\n                    // Extract the object distance from the depth map pixel\n                    float objectDistance = colorToFloat(depthPixel) / 100000.0 * lightRange;\n                    \n                    // Calculate the intensity of this pixel based on the overlaySampler and objectDistance\n                    float intensity = 0.0;\n                    if(overlayPixel.a > 0.6){\n                        intensity = (1.0 - pow(distance / lightRange, 0.3)) * overlayPixel.a;\n                    }else if (objectDistance > pointDistance || objectDistance >= lightRange) {\n                        intensity = 1.0 - distance / lightRange;\n                    }\n\n                    // Add the intensity to the total intensity\n                    totalIntensity += intensity / lightPointCount;\n                }\n\n                // Create a mask based on the intensity\n                gl_FragColor = vec4(vec3(lightIntensity * totalIntensity), 1.0);\n            }\n        '));
+        var _this = _possibleConstructorReturn(this, (ShadowMaskFilter.__proto__ || Object.getPrototypeOf(ShadowMaskFilter)).call(this, "\n            attribute vec2 aVertexPosition;\n            attribute vec2 aTextureCoord;\n            \n            uniform mat3 projectionMatrix;\n            uniform mat3 overlayMatrix;\n            uniform mat3 filterMatrix;\n            \n            varying vec2 vTextureCoord;\n            varying vec2 vOverlayCoord;\n            varying vec2 vFilterCoord;\n            \n            void main(void){\n                gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);\n                vTextureCoord = aTextureCoord;\n                vOverlayCoord = (overlayMatrix * vec3(aTextureCoord, 1.0) ).xy;\n            }\n        ", "\n            varying vec2 vOverlayCoord;\n            varying vec2 vTextureCoord;\n            uniform vec4 filterArea;\n            \n            uniform sampler2D shadowOverlaySampler;\n\n            uniform vec2 dimensions;\n\n            uniform sampler2D shadowSampler;\n\n            uniform bool darkenOverlay;\n\n            uniform float lightPointCount;\n            uniform float lightRange;\n            uniform float lightScatterRange;\n            uniform float lightIntensity;\n\n            " + _FilterFuncs.filterFuncs + "\n            \n            void main(void){\n                float pi = 3.141592653589793238462643;\n                \n                // The current coordinate on the texture measured in pixels\n                vec2 pixelCoord = vTextureCoord * filterArea.xy;\n\n                // The distance delta relative to the center\n                vec2 lightDelta = pixelCoord - dimensions / 2.0;\n                float distance = sqrt(lightDelta.x * lightDelta.x + lightDelta.y * lightDelta.y);\n                if (distance > lightRange) return;\n\n                // The final intensity of the light at this pixel\n                float totalIntensity = 0.0;\n\n                // The intensity of the pixel in the overlay map at this pixel\n                vec4 overlayPixel = texture2D(shadowOverlaySampler, vOverlayCoord);\n\n                // Go through all light points (at most 1000) to add them to the intensity\n                for(float lightIndex=0.0; lightIndex<1000.0; lightIndex++){\n                    if (lightIndex >= lightPointCount) break; // Stop the loop if we went over the pointCount\n\n                    // Calculate the offset of this lightPoint, relative the the center of the light\n                    float lightIndexFrac = (lightIndex + 0.5) / lightPointCount;\n                    float offsetAngle = 2.0 * pi * lightIndexFrac;\n                    vec2 offset = vec2(cos(offsetAngle), sin(offsetAngle)) * lightScatterRange;\n\n                    // Calculate the location of this pixel relative to the lightPoint, and check the depth map\n                    vec2 pointDelta = lightDelta - offset;\n                    float pointDistance = sqrt(pointDelta.x * pointDelta.x + pointDelta.y * pointDelta.y);\n                    float angle = mod(atan(pointDelta.y, pointDelta.x) + 2.0 * pi, 2.0 * pi);\n                    vec4 depthPixel = texture2D(shadowSampler, vec2(angle / (2.0 * pi), lightIndexFrac));\n\n                    // Extract the object distance from the depth map pixel\n                    float objectDistance = colorToFloat(depthPixel) / 100000.0 * lightRange;\n                    \n                    // Calculate the intensity of this pixel based on the overlaySampler and objectDistance\n                    float intensity = 0.0;\n                    if(darkenOverlay){\n                        if(objectDistance > pointDistance || objectDistance >= lightRange){\n                            intensity = 1.0 - distance / lightRange;\n                        }else if(overlayPixel.a > 0.5){\n                            intensity = 1.0 - distance / lightRange;\n                            intensity *= pow(1.0 - (distance - objectDistance) / (lightRange - objectDistance), 2.5) * overlayPixel.a;\n                        }\n                    }else{\n                        if(overlayPixel.a > 0.5){\n                            intensity = (1.0 - pow(distance / lightRange, 0.3)) * overlayPixel.a;\n                        }else if (objectDistance > pointDistance || objectDistance >= lightRange) {\n                            intensity = 1.0 - distance / lightRange;\n                        }\n                    }\n                    \n\n                    // Add the intensity to the total intensity\n                    totalIntensity += intensity / lightPointCount;\n                }\n\n                // Create a mask based on the intensity\n                gl_FragColor = vec4(vec3(lightIntensity * totalIntensity), 1.0);\n            }\n        "));
 
         _this.uniforms.shadowSampler = shadow._shadowMapResultTexture;
         _this.uniforms.lightPointCount = shadow._pointCount;
@@ -45036,8 +45052,11 @@ var ShadowMaskFilter = function (_PIXI$Filter) {
     }
 
     _createClass(ShadowMaskFilter, [{
-        key: 'apply',
+        key: "apply",
         value: function apply(filterManager, input, output) {
+            // Decide whether or not to darken the overlays
+            this.uniforms.darkenOverlay = this.shadow._darkenOverlay;
+
             // Attach the object sampler
             var sc = this.shadow._shadowOverlaySprite;
             this.uniforms.shadowOverlaySpriteDimensions = [sc.width, sc.height];
@@ -45148,13 +45167,16 @@ PIXI.shadows = {
                 // Set up pixi lights if available
                 if (PIXI.lights) {
                         // Set up pixi-light's layers
-                        var diffuseLayer = new PIXI.display.Layer(PIXI.lights.diffuseGroup);
-                        var diffuseBlackSprite = new PIXI.Sprite(diffuseLayer.getRenderTexture());
+                        this.diffuseLayer = new PIXI.display.Layer(PIXI.lights.diffuseGroup);
+                        this.normalLayer = new PIXI.display.Layer(PIXI.lights.normalGroup);
+                        this.lightLayer = new PIXI.display.Layer(PIXI.lights.lightGroup);
+                        var diffuseBlackSprite = new PIXI.Sprite(this.diffuseLayer.getRenderTexture());
                         diffuseBlackSprite.tint = 0;
-                        application.stage.addChild(diffuseLayer, diffuseBlackSprite, new PIXI.display.Layer(PIXI.lights.normalGroup), new PIXI.display.Layer(PIXI.lights.lightGroup));
+
+                        application.stage.addChild(this.diffuseLayer, diffuseBlackSprite, this.normalLayer, this.lightLayer);
 
                         // Add the shadow filter to the diffuse layer
-                        diffuseLayer.filters = [this.filter];
+                        this.diffuseLayer.filters = [this.filter];
                 } else {
 
                         // Add the shadow filter to the container
