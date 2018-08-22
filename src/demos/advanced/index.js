@@ -1,11 +1,11 @@
 // Import everything, can of course just use <script> tags on your page as well.
-import 'pixi.js';
-import 'pixi-layers';
-import '../../shadows'; // This plugin, I use a relative path, but you would use 'pixi-shadows' from npm
+import "pixi.js";
+import "pixi-layers";
+import "../../shadows"; // This plugin, I use a relative path, but you would use 'pixi-shadows' from npm
 
 // Debug/demo imports
-import * as dat from 'dat.gui';
-import Stats from 'stats-js';
+import * as dat from "dat.gui";
+import Stats from "stats-js";
 
 /* The actual demo code: */
 
@@ -13,7 +13,7 @@ import Stats from 'stats-js';
 var demoOptions = {
     followMouse: false,
     shadowX: 450,
-    shadowY: 150,
+    shadowY: 150
 };
 
 // Create your application
@@ -24,7 +24,7 @@ document.body.appendChild(app.view);
 
 // Initialise the shadows plugin
 var world = PIXI.shadows.init(app);
-PIXI.shadows.filter.useShadowCasterAsOverlay = false // Allows us to customise the overlays
+PIXI.shadows.filter.useShadowCasterAsOverlay = false; // Allows us to customise the overlays
 
 // A function to combine different assets if your world object, but give them a common transform by using pixi-layers
 // It is of course recommended to create a custom class for this, but this demo just shows the minimal steps required
@@ -32,19 +32,19 @@ function createShadowSprite(texture, shadowTexture, shadowOverlayTexture) {
     var container = new PIXI.Container(); // This represents your final 'sprite'
 
     // Things that create shadows
-    if(shadowTexture){
+    if (shadowTexture) {
         var shadowCastingSprite = new PIXI.Sprite(shadowTexture);
         shadowCastingSprite.parentGroup = PIXI.shadows.casterGroup;
         container.addChild(shadowCastingSprite);
     }
-    
+
     // Things that are ontop of shadows
-    if(shadowOverlayTexture){
+    if (shadowOverlayTexture) {
         var shadowOverlaySprite = new PIXI.Sprite(shadowOverlayTexture);
         shadowOverlaySprite.parentGroup = PIXI.shadows.overlayGroup;
         container.addChild(shadowOverlaySprite);
     }
-    
+
     // The things themselves (their texture)
     var sprite = new PIXI.Sprite(texture);
     container.addChild(sprite);
@@ -52,7 +52,7 @@ function createShadowSprite(texture, shadowTexture, shadowOverlayTexture) {
     return container;
 }
 
-// Can set ambientLight for the shadow filter, making the shadow less dark: 
+// Can set ambientLight for the shadow filter, making the shadow less dark:
 // PIXI.shadows.filter.ambientLight = 0.4;
 
 // Create a light that casts shadows
@@ -61,14 +61,14 @@ shadow.position.set(demoOptions.shadowX, demoOptions.shadowY);
 world.addChild(shadow);
 
 // Create a background (that doesn't cast shadows)
-var bgTexture = PIXI.Texture.fromImage('assets/background.jpg');
+var bgTexture = PIXI.Texture.fromImage("assets/background.jpg");
 var background = new PIXI.Sprite(bgTexture);
 world.addChild(background);
 
 // Create some shadow casting demons
-var demonTexture = PIXI.Texture.fromImage('assets/flameDemon.png');
-var demonShadowTexture = PIXI.Texture.fromImage('assets/flameDemonShadow.png');
-var demonTexture2 = PIXI.Texture.fromImage('assets/flameDemon2.png');
+var demonTexture = PIXI.Texture.fromImage("assets/flameDemon.png");
+var demonShadowTexture = PIXI.Texture.fromImage("assets/flameDemonShadow.png");
+var demonTexture2 = PIXI.Texture.fromImage("assets/flameDemon2.png");
 demonTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST; //For pixelated scaling
 demonShadowTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
 demonTexture2.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
@@ -90,10 +90,10 @@ world.addChild(demon3);
 
 // Make the light track your mouse
 world.interactive = true;
-world.on('mousemove', function(event){
-    if(demoOptions.followMouse){
+world.on("mousemove", function(event) {
+    if (demoOptions.followMouse) {
         shadow.position.copy(event.data.global);
-    }else{
+    } else {
         shadow.position.x = demoOptions.shadowX;
         shadow.position.y = demoOptions.shadowY;
     }
@@ -101,14 +101,14 @@ world.on('mousemove', function(event){
 
 // Create a light point on click
 var shadows = [];
-world.on('pointerdown', function(event){
+world.on("pointerdown", function(event) {
     var shadow = new PIXI.shadows.Shadow(700, 0.7);
     shadows.push(shadow);
     shadow.position.copy(event.data.global);
     world.addChild(shadow);
 
     // Set the ignore shadow caster if enabled
-    if(ignore["placed shadows"])
+    if (ignore["placed shadows"])
         shadow.ignoreShadowCaster = demon1.children[0];
 });
 
@@ -118,9 +118,9 @@ world.on('pointerdown', function(event){
 var stats = new Stats();
 stats.setMode(0); // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.domElement);
-stats.domElement.style.position = 'absolute';
+stats.domElement.style.position = "absolute";
 stats.domElement.style.top = 0;
-app.ticker.add(function(){
+app.ticker.add(function() {
     stats.begin();
     stats.end();
 });
@@ -144,6 +144,7 @@ shadowGUI.add(shadow, "pointCount", 1, 50, 1);
 shadowGUI.add(shadow, "scatterRange", 0, 50);
 shadowGUI.add(shadow, "radialResolution", 100, 1500, 1);
 shadowGUI.add(shadow, "depthResolution", 0.1, 3);
+shadowGUI.add(shadow, "darkenOverlay");
 
 // Filter controls
 var filter = PIXI.shadows.filter;
@@ -159,15 +160,15 @@ var ignoreCasterGUI = gui.addFolder("Ignore caster per shadow");
 var ignore = {};
 ignore["main shadow"] = false;
 ignore["placed shadows"] = false;
-ignoreCasterGUI.add(ignore, "main shadow").onChange(function(value){
-    if(value)   shadow.ignoreShadowCaster = demon1.children[0];
-    else        shadow.ignoreShadowCaster = null;
+ignoreCasterGUI.add(ignore, "main shadow").onChange(function(value) {
+    if (value) shadow.ignoreShadowCaster = demon1.children[0];
+    else shadow.ignoreShadowCaster = null;
 });
-ignoreCasterGUI.add(ignore, "placed shadows").onChange(function(value){
-    for(var i=0; i<shadows.length; i++){
+ignoreCasterGUI.add(ignore, "placed shadows").onChange(function(value) {
+    for (var i = 0; i < shadows.length; i++) {
         var shadow = shadows[i];
-        if(value)   shadow.ignoreShadowCaster = demon1.children[0];
-        else        shadow.ignoreShadowCaster = null;
+        if (value) shadow.ignoreShadowCaster = demon1.children[0];
+        else shadow.ignoreShadowCaster = null;
     }
 });
 
@@ -178,25 +179,17 @@ var reveal = {
     casters: false,
     overlays: false
 };
-revealGUI.add(reveal, "textures").onChange(function(value){
-    if(value)   world.filters = [];
-    else        world.filters = [PIXI.shadows.filter];
+revealGUI.add(reveal, "textures").onChange(function(value) {
+    if (value) world.filters = [];
+    else world.filters = [PIXI.shadows.filter];
 });
-revealGUI.add(reveal, "casters").onChange(function(value){
-    if(value)   app.stage.addChild(PIXI.shadows.filter._shadowCasterResultSprite);
-    else        app.stage.removeChild(PIXI.shadows.filter._shadowCasterResultSprite);
+revealGUI.add(reveal, "casters").onChange(function(value) {
+    if (value)
+        app.stage.addChild(PIXI.shadows.filter._shadowCasterResultSprite);
+    else app.stage.removeChild(PIXI.shadows.filter._shadowCasterResultSprite);
 });
-revealGUI.add(reveal, "overlays").onChange(function(value){
-    if(value)   app.stage.addChild(PIXI.shadows.filter._shadowOverlayResultSprite);
-    else        app.stage.removeChild(PIXI.shadows.filter._shadowOverlayResultSprite);
-});
-
-
-// Testing stuff
-var extract = new PIXI.extract.webgl(app.renderer);
-app.ticker.add(function(){
-    // console.log(PIXI.shadows.filter._maskResultTexture);
-    // var res = extract.pixels(PIXI.shadows.filter._maskResultTexture.baseTexture);
-    window.res = app.renderer.extract.pixels(PIXI.shadows.filter._maskResultSprite);
-    console.log("detect");
+revealGUI.add(reveal, "overlays").onChange(function(value) {
+    if (value)
+        app.stage.addChild(PIXI.shadows.filter._shadowOverlayResultSprite);
+    else app.stage.removeChild(PIXI.shadows.filter._shadowOverlayResultSprite);
 });

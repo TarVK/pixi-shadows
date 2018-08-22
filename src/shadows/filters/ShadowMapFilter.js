@@ -1,9 +1,10 @@
-import { filterFuncs } from './FilterFuncs';
+import { filterFuncs } from "./FilterFuncs";
 
-let maxDepthResolution = '2000.0';
-export default class ShadowMapFilter extends PIXI.Filter{
-    constructor(shadow){
-        super(`
+let maxDepthResolution = "2000.0";
+export default class ShadowMapFilter extends PIXI.Filter {
+    constructor(shadow) {
+        super(
+            `
             attribute vec2 aVertexPosition;
             attribute vec2 aTextureCoord;
             
@@ -17,7 +18,8 @@ export default class ShadowMapFilter extends PIXI.Filter{
                 gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
                 vTextureCoord = aTextureCoord;
             }
-        `,`
+        `,
+            `
             varying vec2 vMaskCoord;
             varying vec2 vTextureCoord;
             uniform vec4 filterArea;
@@ -35,6 +37,7 @@ export default class ShadowMapFilter extends PIXI.Filter{
             uniform vec2 lightLoc;
 
             uniform float depthResolution;
+            uniform bool darkenOverlay;
 
             uniform vec2 dimensions;
 
@@ -65,6 +68,7 @@ export default class ShadowMapFilter extends PIXI.Filter{
                 float hitDistancePer = 1.0;
 
                 // Increase the distance until we hit an object or reach the maximum value
+                bool reached = false;
                 for(float dist=0.0; dist < ${maxDepthResolution}; dist+=1.0){
                     if(dist > depthRes) break;
                     
@@ -74,20 +78,26 @@ export default class ShadowMapFilter extends PIXI.Filter{
                 
                     // Extract the pixel and check if it is opaque
                     float opacity = texture2D(shadowCasterSampler, coord / shadowCasterSpriteDimensions).a;
-                    if(opacity > 0.5){
+                    if((opacity > 0.0 && darkenOverlay) || opacity > 0.5){
                         // Check if it isn't hitting something that should be ignore
                         if(hasIgnoreShadowCaster){ 
                             vec2 l = (ignoreShadowCasterMatrix * vec3(coord, 1.0)).xy / ignoreShadowCasterDimensions;
                             if(l.x >= -0.01 && l.x <= 1.01 && l.y >= -0.01 && l.y <= 1.01){
                                 // If the pixel at the ignoreShadowCaster is opaque here, skip this pixel
-                                if(opacity > 0.5){
+                                if(opacity > 0.0){
                                     continue;
                                 }
                             }
                         }
 
                         // Calculate the percentage at which this hit occurred, and stop the loop
-                        hitDistancePer = distance / lightRange;
+                        if(!darkenOverlay){
+                            hitDistancePer = distance / lightRange;
+                            break;
+                        }
+                        reached = true;
+                    }else if(reached){
+                        hitDistancePer = (distance - 1.0) / lightRange;
                         break;
                     }
                 }
@@ -95,20 +105,24 @@ export default class ShadowMapFilter extends PIXI.Filter{
                 // Express the distance as a color in the map
                 gl_FragColor = floatToColor(hitDistancePer * 100000.0);
             }
-        `);
-        
+        `
+        );
+
         this.uniforms.lightPointCount = shadow.pointCount;
 
         this.uniforms.dimensions = [shadow.radialResolution, shadow.pointCount];
         this.shadow = shadow;
-        
+
         this.autoFit = false;
         this.padding = 0;
 
         this.ignoreShadowCasterMatrix = new PIXI.Matrix();
     }
-    
-    apply(filterManager, input, output){
+
+    apply(filterManager, input, output) {
+        // Decide whether or not to darken the overlays
+        this.uniforms.darkenOverlay = this.shadow._darkenOverlay;
+
         // Attach the object sampler
         var sc = this.shadow._shadowCasterSprite;
         this.uniforms.shadowCasterSpriteDimensions = [sc.width, sc.height];
@@ -116,7 +130,7 @@ export default class ShadowMapFilter extends PIXI.Filter{
 
         // Use the world transform (data about the absolute location on the screen) to determine the lights relation to the objectSampler
         var wt = this.shadow.worldTransform;
-        var scale = Math.sqrt(wt.a*wt.a + wt.b*wt.b);
+        var scale = Math.sqrt(wt.a * wt.a + wt.b * wt.b);
         var range = this.shadow.range * scale;
         this.uniforms.lightRange = range;
         this.uniforms.lightScatterRange = this.shadow.scatterRange;
@@ -126,13 +140,16 @@ export default class ShadowMapFilter extends PIXI.Filter{
         // Check if there is an object that the filter should attempt to ignore
         var isc = this.shadow.ignoreShadowCaster;
         this.uniforms.hasIgnoreShadowCaster = !!isc;
-        if(isc){
+        if (isc) {
             // Calculate the tranform matrix in order to access the proper pixel of the ignoreObject
             isc.worldTransform.copy(this.ignoreShadowCasterMatrix);
             this.uniforms.ignoreShadowCasterMatrix = this.ignoreShadowCasterMatrix.invert();
 
             // Attach the ignore object
-            this.uniforms.ignoreShadowCasterDimensions = [isc.width, isc.height];
+            this.uniforms.ignoreShadowCasterDimensions = [
+                isc.width,
+                isc.height
+            ];
             this.uniforms.ignoreShadowCasterSampler = isc._texture;
         }
 

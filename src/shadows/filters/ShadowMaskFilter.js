@@ -1,7 +1,8 @@
-import { filterFuncs } from './FilterFuncs';
-export default class ShadowMaskFilter extends PIXI.Filter{
-    constructor(shadow){
-        super(`
+import { filterFuncs } from "./FilterFuncs";
+export default class ShadowMaskFilter extends PIXI.Filter {
+    constructor(shadow) {
+        super(
+            `
             attribute vec2 aVertexPosition;
             attribute vec2 aTextureCoord;
             
@@ -18,7 +19,8 @@ export default class ShadowMaskFilter extends PIXI.Filter{
                 vTextureCoord = aTextureCoord;
                 vOverlayCoord = (overlayMatrix * vec3(aTextureCoord, 1.0) ).xy;
             }
-        `,`
+        `,
+            `
             varying vec2 vOverlayCoord;
             varying vec2 vTextureCoord;
             uniform vec4 filterArea;
@@ -28,6 +30,8 @@ export default class ShadowMaskFilter extends PIXI.Filter{
             uniform vec2 dimensions;
 
             uniform sampler2D shadowSampler;
+
+            uniform bool darkenOverlay;
 
             uniform float lightPointCount;
             uniform float lightRange;
@@ -73,11 +77,21 @@ export default class ShadowMaskFilter extends PIXI.Filter{
                     
                     // Calculate the intensity of this pixel based on the overlaySampler and objectDistance
                     float intensity = 0.0;
-                    if(overlayPixel.a > 0.6){
-                        intensity = (1.0 - pow(distance / lightRange, 0.3)) * overlayPixel.a;
-                    }else if (objectDistance > pointDistance || objectDistance >= lightRange) {
-                        intensity = 1.0 - distance / lightRange;
+                    if(darkenOverlay){
+                        if(objectDistance > pointDistance || objectDistance >= lightRange){
+                            intensity = 1.0 - distance / lightRange;
+                        }else if(overlayPixel.a > 0.5){
+                            intensity = 1.0 - distance / lightRange;
+                            intensity *= pow(1.0 - (distance - objectDistance) / (lightRange - objectDistance), 2.5) * overlayPixel.a;
+                        }
+                    }else{
+                        if(overlayPixel.a > 0.5){
+                            intensity = (1.0 - pow(distance / lightRange, 0.3)) * overlayPixel.a;
+                        }else if (objectDistance > pointDistance || objectDistance >= lightRange) {
+                            intensity = 1.0 - distance / lightRange;
+                        }
                     }
+                    
 
                     // Add the intensity to the total intensity
                     totalIntensity += intensity / lightPointCount;
@@ -86,27 +100,31 @@ export default class ShadowMaskFilter extends PIXI.Filter{
                 // Create a mask based on the intensity
                 gl_FragColor = vec4(vec3(lightIntensity * totalIntensity), 1.0);
             }
-        `);
+        `
+        );
 
         this.uniforms.shadowSampler = shadow._shadowMapResultTexture;
-        this.uniforms.lightPointCount = shadow._pointCount;        
-        
+        this.uniforms.lightPointCount = shadow._pointCount;
+
         this.shadow = shadow;
 
         this.autoFit = false;
         this.padding = 0;
         this.overlayMatrix = new PIXI.Matrix();
     }
-    
-    apply(filterManager, input, output){
+
+    apply(filterManager, input, output) {
+        // Decide whether or not to darken the overlays
+        this.uniforms.darkenOverlay = this.shadow._darkenOverlay;
+
         // Attach the object sampler
         var sc = this.shadow._shadowOverlaySprite;
         this.uniforms.shadowOverlaySpriteDimensions = [sc.width, sc.height];
         this.uniforms.shadowOverlaySampler = sc._texture;
-        
+
         // Use the world transform (data about the absolute location on the screen) to determine the lights relation to the objectSampler
         var wt = this.shadow.worldTransform;
-        var scale = Math.sqrt(wt.a*wt.a + wt.b*wt.b);
+        var scale = Math.sqrt(wt.a * wt.a + wt.b * wt.b);
         var range = this.shadow.range * scale;
         this.uniforms.lightRange = range;
         this.uniforms.lightScatterRange = this.shadow.scatterRange;
@@ -116,10 +134,13 @@ export default class ShadowMaskFilter extends PIXI.Filter{
         // So we have to consider this in the texture size
         var texSize = 2 * this.shadow.range * (wt.a + wt.b);
         this.uniforms.dimensions = [texSize, texSize];
-        
+
         // Calculate the object sampler position in relation to the light
-        this.uniforms.overlayMatrix = filterManager.calculateSpriteMatrix(this.overlayMatrix, sc);
-        
+        this.uniforms.overlayMatrix = filterManager.calculateSpriteMatrix(
+            this.overlayMatrix,
+            sc
+        );
+
         // Apply the filter
         filterManager.applyFilter(this, input, output);
     }

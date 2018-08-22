@@ -1,8 +1,8 @@
 // Import everything, can of course just use <script> tags on your page as well.
-import 'pixi.js';
-import 'pixi-layers';
-import '../../shadows'; // This plugin, I use a relative path, but you would use 'pixi-shadows' from npm
-import * as PixiLights from'pixi-lights';
+import "pixi.js";
+import "pixi-layers";
+import "../../shadows"; // This plugin, I use a relative path, but you would use 'pixi-shadows' from npm
+import * as PixiLights from "pixi-lights";
 // For some reasons PixiLights doesn't 'install' itself with the npm module,
 // so the line below is an easy fix (not relevant if using script tags)
 PIXI.lights = PixiLights;
@@ -31,7 +31,8 @@ function create3DSprite(diffuseTex, normalTex, shadowTexture) {
     normalSprite.parentGroup = PIXI.lights.normalGroup;
     container.addChild(normalSprite);
 
-    if(shadowTexture){ // Only create a shadow casting object if a texture is provided
+    if (shadowTexture) {
+        // Only create a shadow casting object if a texture is provided
         var shadowCastingSprite = new PIXI.Sprite(shadowTexture);
         shadowCastingSprite.parentGroup = PIXI.shadows.casterGroup;
         container.addChild(shadowCastingSprite);
@@ -41,22 +42,22 @@ function create3DSprite(diffuseTex, normalTex, shadowTexture) {
 }
 // A function to combine the pixi-lights and pixi-shadows, and give them a common transform as well
 // Again, it is recommended to create a proper class for this in your application
-function createLight(radius, intensity, color){
+function createLight(radius, intensity, color) {
     var container = new PIXI.Container();
 
     var pixiLight = new PIXI.lights.PointLight(color, intensity);
     container.addChild(pixiLight);
-    
+
     var shadow = new PIXI.shadows.Shadow(radius, 0.7); // Radius in pixels
     container.addChild(shadow);
-    
+
     return container;
 }
 
 // Create an ambient light
 world.addChild(new PIXI.lights.AmbientLight(null, 1));
 world.addChild(new PIXI.lights.DirectionalLight(null, 1, new PIXI.Point(0, 1))); // pixi-shadows doesn't support directional shadows yet
-// Can also set ambientLight for the shadow filter, making the shadow less dark: 
+// Can also set ambientLight for the shadow filter, making the shadow less dark:
 // PIXI.shadows.filter.ambientLight = 0.4;
 
 // Create a light that casts shadows
@@ -65,14 +66,14 @@ light.position.set(300, 300);
 world.addChild(light);
 
 // Create a background (that doesn't cast shadows)
-var bgDiffuseTexture = PIXI.Texture.fromImage('assets/background.jpg', true);
-var bgNormalTexture = PIXI.Texture.fromImage('assets/backgroundNormalMap.jpg');
+var bgDiffuseTexture = PIXI.Texture.fromImage("assets/background.jpg", true);
+var bgNormalTexture = PIXI.Texture.fromImage("assets/backgroundNormalMap.jpg");
 var background = create3DSprite(bgDiffuseTexture, bgNormalTexture);
 world.addChild(background);
 
 // Create some shadow casting blocks
-var blockDiffuse = PIXI.Texture.fromImage('assets/cutBlock.png');
-var blockNormal = PIXI.Texture.fromImage('assets/cutBlockNormalMap.png');
+var blockDiffuse = PIXI.Texture.fromImage("assets/cutBlock.png");
+var blockNormal = PIXI.Texture.fromImage("assets/cutBlockNormalMap.png");
 
 var block1 = create3DSprite(blockDiffuse, blockNormal, blockDiffuse);
 block1.position.set(100, 200);
@@ -88,12 +89,12 @@ world.addChild(block3);
 
 // Make the light track your mouse
 world.interactive = true;
-world.on('mousemove', function(event){
+world.on("mousemove", function(event) {
     light.position.copy(event.data.global);
 });
 
 // Create a light point on click
-world.on('pointerdown', function(event){
+world.on("pointerdown", function(event) {
     var light = createLight(450, 2, 0xffffff);
     light.position.copy(event.data.global);
     world.addChild(light);
