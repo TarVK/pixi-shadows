@@ -35,7 +35,7 @@ Dev dependencies:
 
 ## Usage
 
-Too quickly get going, check out [this example](https://tarvk.github.io/pixi-shadows/build/demos/basic/):
+To quickly get going, check out [this example](https://tarvk.github.io/pixi-shadows/build/demos/basic/):
 
 ```js
 // Import everything, can of course just use <script> tags on your page as well.
@@ -190,7 +190,7 @@ Step by step description of what happens for each rendered frame:
 
 ## Demos overview
 
--   [Basic demo](ttps://tarvk.github.io/pixi-shadows/build/demos/basic/)
+-   [Basic demo](https://tarvk.github.io/pixi-shadows/build/demos/basic/)
 -   [Advanced demo](https://tarvk.github.io/pixi-shadows/build/demos/advanced/)
 -   [Pixi-lights demo](https://tarvk.github.io/pixi-shadows/build/demos/pixi-lights/)
 -   [Process demo](https://tarvk.github.io/pixi-shadows/build/demos/system/)
