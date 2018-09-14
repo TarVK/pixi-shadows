@@ -12,11 +12,30 @@ PIXI.lights = PixiLights;
 // Create your application
 var width = 800;
 var height = 500;
-var app = new PIXI.Application(width, height);
+var app = new PIXI.shadows.Application(width, height);
 document.body.appendChild(app.view);
 
-// Initialise the shadows plugin
-var world = PIXI.shadows.init(app, world);
+/*
+    We are only using the shadows.application because it contains code for the simplest use case of the shadows.
+    You can however just mirror what this code does yourself, and never use this class at all.
+ */
+
+// Set up the lights layers
+app.stage = new PIXI.display.Stage();
+var diffuseLayer = new PIXI.display.Layer(PIXI.lights.diffuseGroup);
+var normalLayer = new PIXI.display.Layer(PIXI.lights.normalGroup);
+var lightLayer = new PIXI.display.Layer(PIXI.lights.lightGroup);
+var diffuseBlackSprite = new PIXI.Sprite(diffuseLayer.getRenderTexture());
+diffuseBlackSprite.tint = 0;
+
+app.stage.addChild(diffuseLayer, diffuseBlackSprite, normalLayer, lightLayer);
+
+// Do the basic shadow setup on the diffuse layer
+app.setupBasicShadows(diffuseLayer);
+
+// Create a world container (Which isn't strictly necessary)
+var world = new PIXI.Container();
+app.stage.addChild(world);
 
 // A function to combine different assets if your world object, but give them a common transform by using pixi-layers
 // It is of course recommended to create a custom class for this, but this demo just shows the minimal steps required
@@ -34,7 +53,7 @@ function create3DSprite(diffuseTex, normalTex, shadowTexture) {
     if (shadowTexture) {
         // Only create a shadow casting object if a texture is provided
         var shadowCastingSprite = new PIXI.Sprite(shadowTexture);
-        shadowCastingSprite.parentGroup = PIXI.shadows.casterGroup;
+        shadowCastingSprite.isShadowCaster = true;
         container.addChild(shadowCastingSprite);
     }
 
@@ -58,7 +77,7 @@ function createLight(radius, intensity, color) {
 world.addChild(new PIXI.lights.AmbientLight(null, 1));
 world.addChild(new PIXI.lights.DirectionalLight(null, 1, new PIXI.Point(0, 1))); // pixi-shadows doesn't support directional shadows yet
 // Can also set ambientLight for the shadow filter, making the shadow less dark:
-// PIXI.shadows.filter.ambientLight = 0.4;
+// diffuseLayer.shadowFilter.ambientLight = 0.4;
 
 // Create a light that casts shadows
 var light = createLight(700, 4, 0xffffff);

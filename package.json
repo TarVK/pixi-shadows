@@ -9,12 +9,14 @@
         "start:basic": "webpack-dev-server --open --config src/demos/basic/webpack.config.js",
         "start:advanced": "webpack-dev-server --open --config src/demos/advanced/webpack.config.js",
         "start:system": "webpack-dev-server --open --config src/demos/system/webpack.config.js",
+        "start:layers": "webpack-dev-server --open --config src/demos/layers/webpack.config.js",
         "build": "webpack",
-        "build:demos": "npm run build-demo:pixi-lights && npm run build-demo:basic && npm run build-demo:advanced && npm run build-demo:system",
+        "build:demos": "npm run build-demo:pixi-lights && npm run build-demo:basic && npm run build-demo:advanced && npm run build-demo:system && npm run build-demo:layers",
         "build-demo:pixi-lights": "webpack --config src/demos/pixi-lights/webpack.config.js",
         "build-demo:basic": "webpack --config src/demos/basic/webpack.config.js",
         "build-demo:advanced": "webpack --config src/demos/advanced/webpack.config.js",
-        "build-demo:system": "webpack --config src/demos/system/webpack.config.js"
+        "build-demo:system": "webpack --config src/demos/system/webpack.config.js",
+        "build-demo:layers": "webpack --config src/demos/layers/webpack.config.js"
     },
     "repository": {
         "type": "git",

@@ -44393,11 +44393,30 @@ PIXI.lights = PixiLights;
 // This plugin, I use a relative path, but you would use 'pixi-shadows' from npm
 var width = 800;
 var height = 500;
-var app = new PIXI.Application(width, height);
+var app = new PIXI.shadows.Application(width, height);
 document.body.appendChild(app.view);
 
-// Initialise the shadows plugin
-var world = PIXI.shadows.init(app, world);
+/*
+    We are only using the shadows.application because it contains code for the simplest use case of the shadows.
+    You can however just mirror what this code does yourself, and never use this class at all.
+ */
+
+// Set up the lights layers
+app.stage = new PIXI.display.Stage();
+var diffuseLayer = new PIXI.display.Layer(PIXI.lights.diffuseGroup);
+var normalLayer = new PIXI.display.Layer(PIXI.lights.normalGroup);
+var lightLayer = new PIXI.display.Layer(PIXI.lights.lightGroup);
+var diffuseBlackSprite = new PIXI.Sprite(diffuseLayer.getRenderTexture());
+diffuseBlackSprite.tint = 0;
+
+app.stage.addChild(diffuseLayer, diffuseBlackSprite, normalLayer, lightLayer);
+
+// Do the basic shadow setup on the diffuse layer
+app.setupBasicShadows(diffuseLayer);
+
+// Create a world container (Which isn't strictly necessary)
+var world = new PIXI.Container();
+app.stage.addChild(world);
 
 // A function to combine different assets if your world object, but give them a common transform by using pixi-layers
 // It is of course recommended to create a custom class for this, but this demo just shows the minimal steps required
@@ -44415,7 +44434,7 @@ function create3DSprite(diffuseTex, normalTex, shadowTexture) {
     if (shadowTexture) {
         // Only create a shadow casting object if a texture is provided
         var shadowCastingSprite = new PIXI.Sprite(shadowTexture);
-        shadowCastingSprite.parentGroup = PIXI.shadows.casterGroup;
+        shadowCastingSprite.isShadowCaster = true;
         container.addChild(shadowCastingSprite);
     }
 
@@ -44439,7 +44458,7 @@ function createLight(radius, intensity, color) {
 world.addChild(new PIXI.lights.AmbientLight(null, 1));
 world.addChild(new PIXI.lights.DirectionalLight(null, 1, new PIXI.Point(0, 1))); // pixi-shadows doesn't support directional shadows yet
 // Can also set ambientLight for the shadow filter, making the shadow less dark:
-// PIXI.shadows.filter.ambientLight = 0.4;
+// diffuseLayer.shadowFilter.ambientLight = 0.4;
 
 // Create a light that casts shadows
 var light = createLight(700, 4, 0xffffff);
@@ -44480,6 +44499,99 @@ world.on("pointerdown", function (event) {
     light.position.copy(event.data.global);
     world.addChild(light);
 });
+
+/***/ }),
+
+/***/ "./src/shadows/Application.js":
+/*!************************************!*\
+  !*** ./src/shadows/Application.js ***!
+  \************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Container = __webpack_require__(/*! ./mixins/Container */ "./src/shadows/mixins/Container.js");
+
+var _Container2 = _interopRequireDefault(_Container);
+
+var _ShadowFilter = __webpack_require__(/*! ./filters/ShadowFilter */ "./src/shadows/filters/ShadowFilter.js");
+
+var _ShadowFilter2 = _interopRequireDefault(_ShadowFilter);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } // Can also be accessed through PIXI.shadows.__classes
+
+
+// Same here, and for all other classes
+
+var Application = function (_PIXI$Application) {
+    _inherits(Application, _PIXI$Application);
+
+    function Application(options, arg2, arg3, arg4, arg5) {
+        _classCallCheck(this, Application);
+
+        // Set up the container mixin so that it tells the filter about the available shadows and objects
+        var _this = _possibleConstructorReturn(this, (Application.__proto__ || Object.getPrototypeOf(Application)).call(this, options, arg2, arg3, arg4, arg5));
+
+        (0, _Container2.default)();
+        return _this;
+    }
+
+    _createClass(Application, [{
+        key: "setupBasicShadows",
+        value: function setupBasicShadows(container) {
+            // If no container is passed, use the stage
+            if (!container) container = this.stage;
+
+            // Create a filter, and apply it to the whole stage (requires a black background)
+            var shadowFilter = new _ShadowFilter2.default(this.renderer.width, this.renderer.height);
+
+            if (!PIXI.shadows.filters) PIXI.shadows.filters = [];
+            PIXI.shadows.filters.push(shadowFilter);
+            container.filters = [shadowFilter];
+
+            //  Also store it on the stage for easy access
+            container.shadowFilter = shadowFilter;
+        }
+    }, {
+        key: "render",
+        value: function render() {
+            var _this2 = this;
+
+            // Update stage transforms
+            var cacheParent = this.stage.parent;
+            this.stage.parent = this.renderer._tempDisplayObjectParent;
+            this.stage.updateTransform();
+            this.stage.parent = cacheParent;
+
+            // Update the shadow filter
+            PIXI.shadows.filterInstances.forEach(function (shadowFilter) {
+                shadowFilter.update(_this2.renderer);
+            });
+            PIXI.shadows.filterInstances = [];
+
+            // Render the stage without updating the transforms again
+            this.renderer.render(this.stage, undefined, undefined, undefined, true);
+        }
+    }]);
+
+    return Application;
+}(PIXI.Application);
+
+exports.default = Application;
 
 /***/ }),
 
@@ -44772,11 +44884,11 @@ var ShadowFilter = function (_PIXI$Filter) {
 
         _this._width = width;
         _this._height = height;
-        _this.tick = 0;
 
         _this.uniforms.ambientLight = 0.0;
         _this.uniforms.size = [_this._width, _this._height];
         _this._useShadowCastersAsOverlay = true;
+        _this._clearShadowMaskBeforeDraw = true;
 
         _this.__createCasterSources();
         _this.__createOverlaySources();
@@ -44840,16 +44952,22 @@ var ShadowFilter = function (_PIXI$Filter) {
 
             // Shadows and objects will automatically be added to containers because of the Container mixin
 
-            this.tick++; // Increase the tick so that shadows and objects know they can add themselves to the container again in their next update
-
             /* render shadow casters */
-            // Remove the parent layer from the objects in order to properly render it to the container
             this._shadowCasterContainer.children.forEach(function (child) {
+                // Remove the parent layer from the objects in order to properly render it to the container
                 child._activeParentLayer = null;
+
+                // Indicate we are performing a sub render in the shadow process (other renders aren't executed)
+                child.renderStep = true;
             });
 
             // Render all the objects onto 1 texture
             renderer.render(this._shadowCasterContainer, this._shadowCasterResultTexture, true, null, true);
+
+            // Indicate that we are no longer performing a sub render in the shadow process
+            this._shadowCasterContainer.children.forEach(function (child) {
+                child.renderStep = false;
+            });
 
             // Remove all the objects from the container
             this._shadowCasterContainer.children.length = 0;
@@ -44858,10 +44976,18 @@ var ShadowFilter = function (_PIXI$Filter) {
             if (!this._useShadowCastersAsOverlay) {
                 this._shadowOverlayContainer.children.forEach(function (child) {
                     child._activeParentLayer = null;
+
+                    // Indicate we are performing a sub render in the shadow process (other renders aren't executed)
+                    child.renderStep = true;
                 });
 
                 // Render all the objects onto 1 texture
                 renderer.render(this._shadowOverlayContainer, this._shadowOverlayResultTexture, true, null, true);
+
+                // Indicate that we are no longer performing a sub render in the shadow process
+                this._shadowOverlayContainer.children.forEach(function (child) {
+                    child.renderStep = false;
+                });
 
                 // Remove all the objects from the container
                 this._shadowOverlayContainer.children.length = 0;
@@ -44877,7 +45003,7 @@ var ShadowFilter = function (_PIXI$Filter) {
             });
 
             // Render all the final shadow masks onto 1 texture
-            renderer.render(this._maskContainer, this._maskResultTexture, true, null, true);
+            renderer.render(this._maskContainer, this._maskResultTexture, this._clearShadowMaskBeforeDraw, null, true);
 
             // Indicate that the shadows may no longer render
             this._maskContainer.children.forEach(function (shadow) {
@@ -44958,7 +45084,7 @@ var ShadowFilter = function (_PIXI$Filter) {
             this.__createMaskSources();
         }
         /**
-         * @type {boolean} Whether or not to use shadow casters as shadow overlays as well 
+         * @type {boolean} Whether or not to use shadow casters as shadow overlays as well
          */
         ,
         get: function get() {
@@ -45165,14 +45291,14 @@ exports.default = ShadowMaskFilter;
 
 
 Object.defineProperty(exports, "__esModule", {
-        value: true
+    value: true
 });
 
 var _Container = __webpack_require__(/*! ./mixins/Container */ "./src/shadows/mixins/Container.js");
 
 var _Container2 = _interopRequireDefault(_Container);
 
-var _Application = __webpack_require__(/*! ./mixins/Application */ "./src/shadows/mixins/Application.js");
+var _Application = __webpack_require__(/*! ./Application */ "./src/shadows/Application.js");
 
 var _Application2 = _interopRequireDefault(_Application);
 
@@ -45199,113 +45325,24 @@ var _Shadow2 = _interopRequireDefault(_Shadow);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 PIXI.shadows = {
-        init: function init(application) {
-                // The objects that will cast shadows
-                this.casterGroup = new PIXI.display.Group();
-                this.casterLayer = new PIXI.display.Layer(this.casterGroup);
+    Application: _Application2.default,
+    Shadow: _Shadow2.default,
+    ShadowFilter: _ShadowFilter2.default,
+    filterInstances: [], // The list of filters that need to be updated
+    filters: [], // A list of filters to apply if no shadowLayers is specified
 
-                // The objects that will remain ontop of the shadows
-                this.overlayGroup = new PIXI.display.Group();
-                this.overlayLayer = new PIXI.display.Layer(this.overlayGroup);
-
-                // Make sure the caster objects aren't actually visible
-                this.casterLayer.renderWebGL = function () {};
-                this.overlayLayer.renderWebGL = function () {};
-
-                // Create the shadow filter
-                this.filter = new _ShadowFilter2.default(application.renderer.width, application.renderer.height);
-
-                // Set up the container mixin so that it tells the filter about the available shadows and objects
-                (0, _Container2.default)(this.casterGroup, this.overlayGroup, this.filter);
-
-                // Overwrite the application render method
-                (0, _Application2.default)(application, this.filter);
-
-                // If a container is specified, set up the filter
-                var container = new PIXI.Container();
-                application.stage.addChild(container);
-
-                // Set up the shadow layers
-                application.stage.addChild(this.casterLayer, this.overlayLayer);
-
-                // Set up pixi lights if available
-                if (PIXI.lights) {
-                        // Set up pixi-light's layers
-                        this.diffuseLayer = new PIXI.display.Layer(PIXI.lights.diffuseGroup);
-                        this.normalLayer = new PIXI.display.Layer(PIXI.lights.normalGroup);
-                        this.lightLayer = new PIXI.display.Layer(PIXI.lights.lightGroup);
-                        var diffuseBlackSprite = new PIXI.Sprite(this.diffuseLayer.getRenderTexture());
-                        diffuseBlackSprite.tint = 0;
-
-                        application.stage.addChild(this.diffuseLayer, diffuseBlackSprite, this.normalLayer, this.lightLayer);
-
-                        // Add the shadow filter to the diffuse layer
-                        this.diffuseLayer.filters = [this.filter];
-                } else {
-
-                        // Add the shadow filter to the container
-                        container.filters = [this.filter];
-                }
-
-                // Rreturn the container to use
-                return container;
-        },
-        Shadow: _Shadow2.default,
-
-        // Making all classes available for if you want to augmnent this code without going into the source and properly building things afterwards
-        __classes: {
-                ContainerSetup: _Container2.default,
-                ApplicationSetup: _Application2.default,
-                ShadowFilter: _ShadowFilter2.default,
-                ShadowMapFilter: _ShadowMapFilter2.default,
-                ShadowMaskFilter: _ShadowMaskFilter2.default,
-                FilterFuncs: _FilterFuncs2.default,
-                Shadow: _Shadow2.default
-        }
+    // Making all classes available for if you want to augmnent this code without going into the source and properly building things afterwards
+    __classes: {
+        ContainerSetup: _Container2.default,
+        Application: _Application2.default,
+        ShadowFilter: _ShadowFilter2.default,
+        ShadowMapFilter: _ShadowMapFilter2.default,
+        ShadowMaskFilter: _ShadowMaskFilter2.default,
+        FilterFuncs: _FilterFuncs2.default,
+        Shadow: _Shadow2.default
+    }
 };
 exports.default = PIXI.shadows;
-
-/***/ }),
-
-/***/ "./src/shadows/mixins/Application.js":
-/*!*******************************************!*\
-  !*** ./src/shadows/mixins/Application.js ***!
-  \*******************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.default = augment;
-function augment(application, shadowFilter) {
-    // Replace the stage with a layered stage
-    application.stage = new PIXI.display.Stage();
-
-    // Remove the current render fucntion
-    application.ticker.remove(application.render, application);
-
-    // Overwrite the render function
-    application.render = function () {
-        // Update stage transforms
-        var cacheParent = this.stage.parent;
-        this.stage.parent = this.renderer._tempDisplayObjectParent;
-        this.stage.updateTransform();
-        this.stage.parent = cacheParent;
-
-        // Update the shadow filter
-        shadowFilter.update(this.renderer);
-
-        // Render the stage without updating the transforms again
-        this.renderer.render(this.stage, undefined, undefined, undefined, true);
-    };
-
-    // Reassign ticker because its setter initialises the render method
-    application.ticker = application.ticker;
-}
 
 /***/ }),
 
@@ -45330,26 +45367,45 @@ var _Shadow2 = _interopRequireDefault(_Shadow);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function setup(shadowCasterGroup, shadowOverlayGroup, shadowFilter) {
+function setup() {
     var orTransform = PIXI.Container.prototype.updateTransform;
     PIXI.Container.prototype.updateTransform = function () {
+        var _this = this;
 
-        if (this.parentGroup == shadowCasterGroup) {
-            if (this.tick != shadowFilter.tick) shadowFilter._shadowCasterContainer.children.push(this);
-            this.tick = shadowFilter.tick;
-        }
+        if (this.shadowLayers || this.isShadowCaster || this.isShadowOverlay || this instanceof _Shadow2.default) {
+            // Find all the filters that this container should be added to
+            var filters = this.shadowLayers && this.shadowLayers.map(function (layer) {
+                return layer.shadowFilter;
+            }) || PIXI.shadows.filters;
+            if (this.isShadowCaster) this.shadowLayers;
 
-        if (this.parentGroup == shadowOverlayGroup) {
-            if (this.tick != shadowFilter.tick) shadowFilter._shadowOverlayContainer.children.push(this);
-            this.tick = shadowFilter.tick;
-        }
+            // Go through all retrieved filters
+            filters.forEach(function (shadowFilter) {
+                // Add this container to the correct set of objects (casters | overlays | shadows)
+                if (_this.isShadowCaster) {
+                    shadowFilter._shadowCasterContainer.children.push(_this);
+                } else if (_this.isShadowOverlay) {
+                    shadowFilter._shadowOverlayContainer.children.push(_this);
+                } else if (_this instanceof _Shadow2.default) {
+                    shadowFilter._maskContainer.children.push(_this);
+                }
 
-        if (this instanceof _Shadow2.default) {
-            if (this.tick != shadowFilter.tick) shadowFilter._maskContainer.children.push(this);
-            this.tick = shadowFilter.tick;
+                // Make sure that the filter's existence is known so it will be updated
+                if (PIXI.shadows.filterInstances.indexOf(shadowFilter) == -1) PIXI.shadows.filterInstances.push(shadowFilter);
+            });
         }
 
         return orTransform.apply(this, arguments);
+    };
+
+    var orRenderWebGL = PIXI.Container.prototype.renderWebGL;
+    PIXI.Container.prototype.renderWebGL = function () {
+        if (this.shadowLayers || this.isShadowCaster || this.isShadowOverlay || this instanceof _Shadow2.default) {
+            // Don't render if it is called by the normal render function (renderStep is set in ShadowFilter.update)
+            if (!this.renderStep) return;
+        }
+
+        return orRenderWebGL.apply(this, arguments);
     };
 }
 

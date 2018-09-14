@@ -1,6 +1,5 @@
 // Import everything, can of course just use <script> tags on your page as well.
 import "pixi.js";
-import "pixi-layers";
 import "../../shadows"; // This plugin, I use a relative path, but you would use 'pixi-shadows' from npm
 
 /* The actual demo code: */
@@ -8,11 +7,20 @@ import "../../shadows"; // This plugin, I use a relative path, but you would use
 // Create your application
 var width = 800;
 var height = 500;
-var app = new PIXI.Application(width, height);
+var app = new PIXI.shadows.Application(width, height);
 document.body.appendChild(app.view);
 
-// Create a world container
-var world = PIXI.shadows.init(app, world);
+// Do the basic shadow setup
+app.setupBasicShadows();
+
+/*
+    We are only using the shadows.application because it contains code for the simplest use case of the shadows.
+    You can however just mirror what this code does yourself, and never use this class at all.
+ */
+
+// Create a world container (Which isn't strictly necessary)
+var world = new PIXI.Container();
+app.stage.addChild(world);
 
 // A function to combine different assets if your world object, but give them a common transform by using pixi-layers
 // It is of course recommended to create a custom class for this, but this demo just shows the minimal steps required
@@ -22,7 +30,7 @@ function createShadowSprite(texture, shadowTexture) {
     // Things that create shadows
     if (shadowTexture) {
         var shadowCastingSprite = new PIXI.Sprite(shadowTexture);
-        shadowCastingSprite.parentGroup = PIXI.shadows.casterGroup;
+        shadowCastingSprite.isShadowCaster = true;
         container.addChild(shadowCastingSprite);
     }
 
@@ -34,7 +42,7 @@ function createShadowSprite(texture, shadowTexture) {
 }
 
 // Can set ambientLight for the shadow filter, making the shadow less dark:
-// PIXI.shadows.filter.ambientLight = 0.4;
+// app.stage.shadowFilter.ambientLight = 0.4;
 
 // Create a light that casts shadows
 var shadow = new PIXI.shadows.Shadow(700, 1);
