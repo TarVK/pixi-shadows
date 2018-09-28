@@ -61,6 +61,7 @@ export default class Shadow extends PIXI.Sprite {
         // Create the mask filter
         var filter = new ShadowMaskFilter(this);
         filter.blendMode = PIXI.BLEND_MODES.ADD;
+        this.shadowFilter = filter;
         this.filters = [filter];
     }
     // Properly dispose all the created resources

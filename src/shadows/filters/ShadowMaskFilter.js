@@ -32,6 +32,7 @@ export default class ShadowMaskFilter extends PIXI.Filter {
             uniform sampler2D shadowSampler;
 
             uniform bool darkenOverlay;
+            uniform bool inverted;
 
             uniform float lightPointCount;
             uniform float lightRange;
@@ -85,10 +86,20 @@ export default class ShadowMaskFilter extends PIXI.Filter {
                             intensity *= pow(1.0 - (distance - objectDistance) / (lightRange - objectDistance), 2.5) * overlayPixel.a;
                         }
                     }else{
-                        if(overlayPixel.a > 0.5){
-                            intensity = (1.0 - pow(distance / lightRange, 0.3)) * overlayPixel.a;
-                        }else if (objectDistance > pointDistance || objectDistance >= lightRange) {
-                            intensity = 1.0 - distance / lightRange;
+                        if(inverted){
+                            if(overlayPixel.a > 0.5){
+                                intensity = 1.0-overlayPixel.a;
+                            }else if (objectDistance > pointDistance || objectDistance >= lightRange) {
+                                intensity = 0.0;
+                            }else{
+                                intensity = 1.0;
+                            }
+                        }else{
+                            if(overlayPixel.a > 0.5){
+                                intensity = (1.0 - pow(distance / lightRange, 0.3)) * overlayPixel.a;
+                            }else if (objectDistance > pointDistance || objectDistance >= lightRange) {
+                                intensity = 1.0 - distance / lightRange;
+                            }
                         }
                     }
                     
@@ -107,6 +118,7 @@ export default class ShadowMaskFilter extends PIXI.Filter {
         this.uniforms.lightPointCount = shadow._pointCount;
 
         this.shadow = shadow;
+        this._inverted = false;
 
         this.autoFit = false;
         this.padding = 0;
@@ -129,6 +141,9 @@ export default class ShadowMaskFilter extends PIXI.Filter {
         this.uniforms.lightRange = range;
         this.uniforms.lightScatterRange = this.shadow.scatterRange;
         this.uniforms.lightIntensity = this.shadow.intensity;
+
+        // Invert the filter if specified
+        this.uniforms.inverted = this._inverted;
 
         // Texture size increase in order to fit the sprite rectangle (even though we are only interested in a circle)
         // So we have to consider this in the texture size
