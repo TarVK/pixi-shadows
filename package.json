@@ -1,6 +1,6 @@
 {
     "name": "pixi-shadows",
-    "version": "0.0.4",
+    "version": "0.0.6",
     "description": "A plugin for PixiJS V4 that allows you to add dymanic shadows to your stage",
     "main": "build/shadows/node/pixi-shadows.js",
     "scripts": {

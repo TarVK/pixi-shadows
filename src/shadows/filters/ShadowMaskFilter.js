@@ -100,7 +100,7 @@ export default class ShadowMaskFilter extends PIXI.Filter {
                             if (objectDistance > pointDistance || objectDistance >= lightRange) {
                                 intensity = 1.0 - distance / lightRange;
                             }else if (overlayPixel.a > 0.5) {
-                                intensity = (1.0 - distance / lightRange) * (1.0 - (pointDistance - objectDistance) / overlayLightLength);
+                                intensity = (1.0 - distance / lightRange) * max(0.0, min(1.0, (1.0 - (pointDistance - objectDistance) / overlayLightLength)));
                             }
                         }
                     }
