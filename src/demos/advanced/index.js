@@ -144,6 +144,7 @@ shadowGUI.add(shadow, "pointCount", 1, 50, 1);
 shadowGUI.add(shadow, "scatterRange", 0, 50);
 shadowGUI.add(shadow, "radialResolution", 100, 1500, 1);
 shadowGUI.add(shadow, "depthResolution", 0.1, 3);
+shadowGUI.add(shadow, "overlayLightLength", 10, 1000);
 shadowGUI.add(shadow, "darkenOverlay");
 
 // Filter controls

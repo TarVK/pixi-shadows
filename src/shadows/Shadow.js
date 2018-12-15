@@ -22,6 +22,7 @@ export default class Shadow extends PIXI.Sprite {
         this._radialResolution = 800;
         this._depthResolution = 1; //per screen pixel
         this._darkenOverlay = false;
+        this._overlayLightLength = Infinity;
         this.anchor.set(0.5);
 
         this._ignoreShadowCaster;
@@ -61,6 +62,7 @@ export default class Shadow extends PIXI.Sprite {
         // Create the mask filter
         var filter = new ShadowMaskFilter(this);
         filter.blendMode = PIXI.BLEND_MODES.ADD;
+        this.shadowFilter = filter;
         this.filters = [filter];
     }
     // Properly dispose all the created resources
@@ -142,6 +144,12 @@ export default class Shadow extends PIXI.Sprite {
     set darkenOverlay(bool) {
         this._darkenOverlay = bool;
     }
+    /**
+     * @type {number} How many pixels of the overlay should be lit up by the light
+     */
+    set overlayLightLength(length) {
+        this._overlayLightLength = length;
+    }
 
     // Attribute getters
     get range() {
@@ -167,5 +175,8 @@ export default class Shadow extends PIXI.Sprite {
     }
     get darkenOverlay() {
         return this._darkenOverlay;
+    }
+    get overlayLightLength() {
+        return this._overlayLightLength;
     }
 }
