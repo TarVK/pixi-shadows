@@ -34,6 +34,8 @@ export default class ShadowMaskFilter extends PIXI.Filter {
             uniform bool darkenOverlay;
             uniform bool inverted;
 
+            uniform float overlayLightLength;
+
             uniform float lightPointCount;
             uniform float lightRange;
             uniform float lightScatterRange;
@@ -95,10 +97,10 @@ export default class ShadowMaskFilter extends PIXI.Filter {
                                 intensity = 1.0;
                             }
                         }else{
-                            if(overlayPixel.a > 0.5){
-                                intensity = (1.0 - pow(distance / lightRange, 0.3)) * overlayPixel.a;
-                            }else if (objectDistance > pointDistance || objectDistance >= lightRange) {
+                            if (objectDistance > pointDistance || objectDistance >= lightRange) {
                                 intensity = 1.0 - distance / lightRange;
+                            }else if (overlayPixel.a > 0.5) {
+                                intensity = (1.0 - distance / lightRange) * (1.0 - (pointDistance - objectDistance) / overlayLightLength);
                             }
                         }
                     }
@@ -141,6 +143,9 @@ export default class ShadowMaskFilter extends PIXI.Filter {
         this.uniforms.lightRange = range;
         this.uniforms.lightScatterRange = this.shadow.scatterRange;
         this.uniforms.lightIntensity = this.shadow.intensity;
+
+        // The length of the area of the overlay to be lit
+        this.uniforms.overlayLightLength = this.shadow.overlayLightLength;
 
         // Invert the filter if specified
         this.uniforms.inverted = this._inverted;
