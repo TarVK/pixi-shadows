@@ -152,8 +152,9 @@ export default class ShadowMaskFilter extends PIXI.Filter {
 
         // Texture size increase in order to fit the sprite rectangle (even though we are only interested in a circle)
         // So we have to consider this in the texture size
-        var texSize = 2 * this.shadow.range * (wt.a + wt.b);
-        this.uniforms.dimensions = [texSize, texSize];
+        var texWidth = this.shadow.range * Math.abs(wt.a + wt.b) * 2;
+        var texHeight = this.shadow.range * Math.abs(wt.d - wt.c) * 2;
+        this.uniforms.dimensions = [texWidth, texHeight];
 
         // Calculate the object sampler position in relation to the light
         this.uniforms.overlayMatrix = filterManager.calculateSpriteMatrix(
