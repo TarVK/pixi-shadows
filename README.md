@@ -52,7 +52,7 @@ var app = new PIXI.Application(width, height);
 document.body.appendChild(app.view);
 
 // Create a world container
-var world = PIXI.shadows.init(app, world);
+var world = PIXI.shadows.init(app);
 
 // A function to combine different assets of your world object, but give them a common transform by using pixi-layers
 // It is of course recommended to create a custom class for this, but this demo just shows the minimal steps required
