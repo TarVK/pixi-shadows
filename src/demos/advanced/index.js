@@ -1,4 +1,4 @@
-// Import everything, can of course just use <script> tags on your page as well.
+// Import everything, you can of course just use <script> tags on your page as well.
 import "pixi.js";
 import "pixi-layers";
 import "../../shadows"; // This plugin, I use a relative path, but you would use 'pixi-shadows' from npm
@@ -26,7 +26,7 @@ document.body.appendChild(app.view);
 var world = PIXI.shadows.init(app);
 PIXI.shadows.filter.useShadowCasterAsOverlay = false; // Allows us to customise the overlays
 
-// A function to combine different assets if your world object, but give them a common transform by using pixi-layers
+// A function to combine different assets of your world object, but give them a common transform by using pixi-layers
 // It is of course recommended to create a custom class for this, but this demo just shows the minimal steps required
 function createShadowSprite(texture, shadowTexture, shadowOverlayTexture) {
     var container = new PIXI.Container(); // This represents your final 'sprite'
