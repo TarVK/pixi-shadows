@@ -38,7 +38,7 @@ Dev dependencies:
 To quickly get going, check out [this example](https://tarvk.github.io/pixi-shadows/build/demos/basic/):
 
 ```js
-// Import everything, can of course just use <script> tags on your page as well.
+// Import everything, you can of course just use <script> tags on your page as well.
 import "pixi.js";
 import "pixi-layers";
 import "pixi-shadows";
@@ -52,9 +52,9 @@ var app = new PIXI.Application(width, height);
 document.body.appendChild(app.view);
 
 // Create a world container
-var world = PIXI.shadows.init(app, world);
+var world = PIXI.shadows.init(app);
 
-// A function to combine different assets if your world object, but give them a common transform by using pixi-layers
+// A function to combine different assets of your world object, but give them a common transform by using pixi-layers
 // It is of course recommended to create a custom class for this, but this demo just shows the minimal steps required
 function createShadowSprite(texture, shadowTexture) {
     var container = new PIXI.Container(); // This represents your final 'sprite'

@@ -33,7 +33,7 @@ I made it for usage in a personal project, and had to learn how to work with gls
 </ul>
 <h2 id="usage"><a class="header-link" href="#usage"></a>Usage</h2>
 <p>Too quickly get going, check out <a href="https://tarvk.github.io/pixi-shadows/build/demos/basic/">this example</a>:</p>
-<pre class="hljs"><code><span class="hljs-comment">// Import everything, can of course just use &lt;script&gt; tags on your page as well.</span>
+<pre class="hljs"><code><span class="hljs-comment">// Import everything, you can of course just use &lt;script&gt; tags on your page as well.</span>
 <span class="hljs-keyword">import</span> <span class="hljs-string">'pixi.js'</span>;
 <span class="hljs-keyword">import</span> <span class="hljs-string">'pixi-layers'</span>;
 <span class="hljs-keyword">import</span> <span class="hljs-string">'pixi-shadows'</span>;
@@ -47,9 +47,9 @@ I made it for usage in a personal project, and had to learn how to work with gls
 <span class="hljs-built_in">document</span>.body.appendChild(app.view);
 
 <span class="hljs-comment">// Create a world container</span>
-<span class="hljs-keyword">var</span> world = PIXI.shadows.init(app, world);
+<span class="hljs-keyword">var</span> world = PIXI.shadows.init(app);
 
-<span class="hljs-comment">// A function to combine different assets if your world object, but give them a common transform by using pixi-layers</span>
+<span class="hljs-comment">// A function to combine different assets of your world object, but give them a common transform by using pixi-layers</span>
 <span class="hljs-comment">// It is of course recommended to create a custom class for this, but this demo just shows the minimal steps required</span>
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createShadowSprite</span>(<span class="hljs-params">texture, shadowTexture</span>) </span>{
     <span class="hljs-keyword">var</span> container = <span class="hljs-keyword">new</span> PIXI.Container(); <span class="hljs-comment">// This represents your final 'sprite'</span>
