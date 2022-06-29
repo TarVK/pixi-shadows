@@ -1,6 +1,7 @@
+import { Stage } from '@pixi/layers';
 export default function augment(application, shadowFilter){
     // Replace the stage with a layered stage
-    application.stage = new PIXI.display.Stage();
+    application.stage = new Stage();
 
     // Remove the current render function
     application.ticker.remove(application.render, application); 
@@ -9,7 +10,9 @@ export default function augment(application, shadowFilter){
     application.render = function(){
         // Update stage transforms
         const cacheParent = this.stage.parent;
-        this.stage.parent = this.renderer._tempDisplayObjectParent;
+        // this.stage.parent = this.renderer._tempDisplayObjectParent;
+        // this.stage.parent = this.stage._tempDisplayObjectParent;
+        this.stage.parent = this.stage;
         this.stage.updateTransform();
         this.stage.parent = cacheParent;
     

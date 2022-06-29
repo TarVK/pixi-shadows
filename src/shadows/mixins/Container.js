@@ -1,7 +1,8 @@
+import { Container } from '@pixi/display';
 import Shadow from '../Shadow';
 export default function setup(shadowCasterGroup, shadowOverlayGroup, shadowFilter){
-    const orTransform = PIXI.Container.prototype.updateTransform;
-    PIXI.Container.prototype.updateTransform = function(){
+    const orTransform = Container.prototype.updateTransform;
+    Container.prototype.updateTransform = function(){
 
         if(this.parentGroup == shadowCasterGroup){
             if(this.tick != shadowFilter.tick)

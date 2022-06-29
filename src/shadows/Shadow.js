@@ -1,5 +1,7 @@
-import ShadowMaskFilter from "./filters/ShadowMaskFilter";
+import {BLEND_MODES, RenderTexture, SCALE_MODES, Sprite} from 'pixi.js';
+
 import ShadowMapFilter from "./filters/ShadowMapFilter";
+import ShadowMaskFilter from "./filters/ShadowMaskFilter";
 
 /**
  * @class
@@ -11,9 +13,9 @@ import ShadowMapFilter from "./filters/ShadowMapFilter";
  * @param [scatterRange=15] {number} The radius at which the points of the light should be scattered.
  */
 
-export default class Shadow extends PIXI.Sprite {
+export default class Shadow extends Sprite {
     constructor(range, intensity, pointCount, scatterRange) {
-        super(PIXI.RenderTexture.create(range * 2, range * 2));
+        super(RenderTexture.create(range * 2, range * 2));
 
         this._range = range;
         this._pointCount = pointCount || 20; //The number of lightpoins
@@ -32,7 +34,7 @@ export default class Shadow extends PIXI.Sprite {
     // Create the texture to apply this mask filter to
     __updateTextureSize() {
         this.texture.destroy();
-        this.texture = PIXI.RenderTexture.create(
+        this.texture = RenderTexture.create(
             this._range * 2,
             this._range * 2
         );
@@ -45,23 +47,23 @@ export default class Shadow extends PIXI.Sprite {
             this._shadowMapResultTexture.destroy();
 
         // A blank texture/sprite to apply the filter to
-        this._shadowMapResultTexture = PIXI.RenderTexture.create(
+        this._shadowMapResultTexture = RenderTexture.create(
             this._radialResolution,
             this._pointCount
         );
         this._shadowMapResultTexture.baseTexture.scaleMode =
-            PIXI.SCALE_MODES.NEAREST;
-        this._shadowMapSprite = new PIXI.Sprite(this._shadowMapResultTexture);
+            SCALE_MODES.NEAREST;
+        this._shadowMapSprite = new Sprite(this._shadowMapResultTexture);
         this._shadowMapSprite.filters = [new ShadowMapFilter(this)];
 
         // The resulting texture/sprite after the filter has been applied
-        this._shadowMapResultSprite = new PIXI.Sprite(
+        this._shadowMapResultSprite = new Sprite(
             this._shadowMapResultTexture
         );
 
         // Create the mask filter
         var filter = new ShadowMaskFilter(this);
-        filter.blendMode = PIXI.BLEND_MODES.ADD;
+        filter.blendMode = BLEND_MODES.ADD;
         this.shadowFilter = filter;
         this.filters = [filter];
     }
@@ -133,7 +135,7 @@ export default class Shadow extends PIXI.Sprite {
         this._depthResolution = resolution;
     }
     /**
-     * @type {PIXI.Sprite} A shadow caster to ignore while creating the shadows. (Can be used if sprite and light always overlap).
+     * @type {Sprite} A shadow caster to ignore while creating the shadows. (Can be used if sprite and light always overlap).
      */
     set ignoreShadowCaster(sprite) {
         this._ignoreShadowCaster = sprite;

@@ -1,5 +1,8 @@
+import { Filter, Matrix } from 'pixi.js';
+
 import { filterFuncs } from "./FilterFuncs";
-export default class ShadowMaskFilter extends PIXI.Filter {
+
+export default class ShadowMaskFilter extends Filter {
     constructor(shadow) {
         super(
             `
@@ -124,7 +127,7 @@ export default class ShadowMaskFilter extends PIXI.Filter {
 
         this.autoFit = false;
         this.padding = 0;
-        this.overlayMatrix = new PIXI.Matrix();
+        this.overlayMatrix = new Matrix();
     }
 
     apply(filterManager, input, output) {

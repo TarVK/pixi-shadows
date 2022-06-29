@@ -1,4 +1,6 @@
-export default class ShadowFilter extends PIXI.Filter {
+import { Container, Filter, Matrix, RenderTexture, SCALE_MODES, Sprite, TextureMatrix } from 'pixi.js';
+
+export default class ShadowFilter extends Filter {
     constructor(width, height) {
         super(
             `
@@ -59,16 +61,16 @@ export default class ShadowFilter extends PIXI.Filter {
             this._shadowOverlayResultSprite.destroy();
 
         if (!this._shadowOverlayContainer)
-            this._shadowOverlayContainer = new PIXI.Container();
+            this._shadowOverlayContainer = new Container();
 
         // Create the final mask to apply to the container that this filter is applied to
-        this._shadowOverlayResultTexture = PIXI.RenderTexture.create(
+        this._shadowOverlayResultTexture = RenderTexture.create(
             this._width,
             this._height
         );
         this._shadowOverlayResultTexture.baseTexture.scaleMode =
-            PIXI.SCALE_MODES.NEAREST;
-        this._shadowOverlayResultSprite = new PIXI.Sprite(
+            SCALE_MODES.NEAREST;
+        this._shadowOverlayResultSprite = new Sprite(
             this._shadowOverlayResultTexture
         );
     }
@@ -80,16 +82,16 @@ export default class ShadowFilter extends PIXI.Filter {
             this._shadowCasterResultSprite.destroy();
 
         if (!this._shadowCasterContainer)
-            this._shadowCasterContainer = new PIXI.Container();
+            this._shadowCasterContainer = new Container();
 
         // Create the final mask to apply to the container that this filter is applied to
-        this._shadowCasterResultTexture = PIXI.RenderTexture.create(
+        this._shadowCasterResultTexture = RenderTexture.create(
             this._width,
             this._height
         );
         this._shadowCasterResultTexture.baseTexture.scaleMode =
-            PIXI.SCALE_MODES.NEAREST;
-        this._shadowCasterResultSprite = new PIXI.Sprite(
+            SCALE_MODES.NEAREST;
+        this._shadowCasterResultSprite = new Sprite(
             this._shadowCasterResultTexture
         );
     }
@@ -99,17 +101,17 @@ export default class ShadowFilter extends PIXI.Filter {
         if (this._maskResultSprite) this._maskResultSprite.destroy();
 
         // Create maskMatrix for shader transform data
-        if (!this._maskMatrix) this._maskMatrix = new PIXI.Matrix();
+        if (!this._maskMatrix) this._maskMatrix = new Matrix();
 
         // Create the final mask to apply to the container that this filter is applied to
-        this._maskResultTexture = PIXI.RenderTexture.create(
+        this._maskResultTexture = RenderTexture.create(
             this._width,
             this._height
         );
         this._maskResultTexture.baseTexture.scaleMode =
-            PIXI.SCALE_MODES.NEAREST;
-        if (!this._maskContainer) this._maskContainer = new PIXI.Container();
-        this._maskResultSprite = new PIXI.Sprite(this._maskResultTexture);
+            SCALE_MODES.NEAREST;
+        if (!this._maskContainer) this._maskContainer = new Container();
+        this._maskResultSprite = new Sprite(this._maskResultTexture);
     }
     // Update the mask texture (called from the Application mixin)
     update(renderer) {
@@ -193,7 +195,7 @@ export default class ShadowFilter extends PIXI.Filter {
             return;
         }
         if (!tex.transform) {
-            tex.transform = new PIXI.TextureMatrix(tex, 0.0);
+            tex.transform = new TextureMatrix(tex, 0.0);
         }
 
         this.uniforms.mask = tex;

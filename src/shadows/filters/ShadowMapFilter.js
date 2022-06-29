@@ -1,7 +1,9 @@
+import { Filter, Matrix } from 'pixi.js';
+
 import { filterFuncs } from "./FilterFuncs";
 
 let maxDepthResolution = "2000.0";
-export default class ShadowMapFilter extends PIXI.Filter {
+export default class ShadowMapFilter extends Filter {
     constructor(shadow) {
         super(
             `
@@ -116,7 +118,7 @@ export default class ShadowMapFilter extends PIXI.Filter {
         this.autoFit = false;
         this.padding = 0;
 
-        this.ignoreShadowCasterMatrix = new PIXI.Matrix();
+        this.ignoreShadowCasterMatrix = new Matrix();
     }
 
     apply(filterManager, input, output) {
@@ -142,7 +144,7 @@ export default class ShadowMapFilter extends PIXI.Filter {
         this.uniforms.hasIgnoreShadowCaster = !!isc;
         if (isc) {
             // Calculate the tranform matrix in order to access the proper pixel of the ignoreObject
-            isc.worldTransform.copy(this.ignoreShadowCasterMatrix);
+            isc.worldTransform.copyFrom(this.ignoreShadowCasterMatrix);
             this.uniforms.ignoreShadowCasterMatrix = this.ignoreShadowCasterMatrix.invert();
 
             // Attach the ignore object
