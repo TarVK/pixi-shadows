@@ -38,7 +38,6 @@
         "babel-preset-env": "^1.7.0",
         "cross-env": "^7.0.3",
         "dat.gui": "^0.7.2",
-        "pixi-lights": "^3.0.0",
         "stats-js": "^1.0.0-alpha1",
         "webpack": "^4.16.2",
         "webpack-cli": "^3.1.0",

@@ -22,9 +22,9 @@ or copy [the pixi-shadows script](https://github.com/TarVK/pixi-shadows/blob/mas
 
 Usage dependencies:
 
-- [pixi v4](https://github.com/pixijs/pixi.js/): Tested with version 4.8.0
-- [pixi-layers](https://github.com/pixijs/pixi-display): Tested with version 0.1.9
-- [pixi-lights](https://github.com/pixijs/pixi-lights): (optional) Tested with version 2.0.1
+- [pixi v6](https://github.com/pixijs/pixi.js/): Tested with version 6.4.2
+- [@pixi/layers](https://github.com/pixijs/layers): Tested with version 1.0.11
+- [pixi-lights](https://github.com/pixijs/pixi-lights): Tested with version 3.0.0
 
 Dev dependencies:
 
@@ -39,10 +39,13 @@ To quickly get going, check out [this example](https://tarvk.github.io/pixi-shad
 
 ```js
 // Import everything, you can of course just use <script> tags on your page as well.
-import "pixi.js";
-import "pixi-layers";
-import "pixi-shadows";
+import * as PIXI from "pixi.js";
+import { AppLoaderPlugin, Shadow } from "pixi-shadows";
+import { applyCanvasMixin } from "@pixi/layers";
 
+// Initialise the shadows plugin
+PIXI.extensions.add(AppLoaderPlugin);
+applyCanvasMixin(PIXI.CanvasRenderer);
 /* The actual demo code: */
 
 // Create your application
@@ -50,9 +53,10 @@ var width = 800;
 var height = 500;
 var app = new PIXI.Application(width, height);
 document.body.appendChild(app.view);
+// AppLoaderPlugin.init.apply(app);
 
 // Create a world container
-var world = PIXI.shadows.init(app);
+var world = app.shadows.container;
 
 // A function to combine different assets of your world object, but give them a common transform by using pixi-layers
 // It is of course recommended to create a custom class for this, but this demo just shows the minimal steps required
@@ -62,7 +66,7 @@ function createShadowSprite(texture, shadowTexture) {
   // Things that create shadows
   if (shadowTexture) {
     var shadowCastingSprite = new PIXI.Sprite(shadowTexture);
-    shadowCastingSprite.parentGroup = PIXI.shadows.casterGroup;
+    shadowCastingSprite.parentGroup = app.shadows.casterGroup;
     container.addChild(shadowCastingSprite);
   }
 
@@ -73,18 +77,21 @@ function createShadowSprite(texture, shadowTexture) {
   return container;
 }
 
+// Can set ambientLight for the shadow filter, making the shadow less dark:
+// PIXI.shadows.filter.ambientLight = 0.4;
+
 // Create a light that casts shadows
-var shadow = new PIXI.shadows.Shadow(700, 1);
+var shadow = new Shadow(700, 1);
 shadow.position.set(450, 150);
 world.addChild(shadow);
 
 // Create a background (that doesn't cast shadows)
-var bgTexture = PIXI.Texture.fromImage("assets/background.jpg");
+var bgTexture = PIXI.Texture.from("assets/background.jpg");
 var background = new PIXI.Sprite(bgTexture);
 world.addChild(background);
 
 // Create some shadow casting demons
-var demonTexture = PIXI.Texture.fromImage("assets/flameDemon.png");
+var demonTexture = PIXI.Texture.from("assets/flameDemon.png");
 demonTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST; //For pixelated scaling
 
 var demon1 = createShadowSprite(demonTexture, demonTexture);
@@ -105,13 +112,13 @@ world.addChild(demon3);
 // Make the light track your mouse
 world.interactive = true;
 world.on("mousemove", function (event) {
-  shadow.position.copy(event.data.global);
+  shadow.position.copyFrom(event.data.global);
 });
 
 // Create a light point on click
 world.on("pointerdown", function (event) {
-  var shadow = new PIXI.shadows.Shadow(700, 0.7);
-  shadow.position.copy(event.data.global);
+  var shadow = new Shadow(700, 0.7);
+  shadow.position.copyFrom(event.data.global);
   world.addChild(shadow);
 });
 ```
@@ -120,14 +127,14 @@ world.on("pointerdown", function (event) {
 
 Main steps:
 
-- Initialisation: The `PIXI.shadows.init(application)` method can be used to set up your app properly. This does some fairly specific things however, which might not be correct in your usage case. So you can also decide to ignore the step and manually set up your application. Please check out what the init method does in [this file](https://github.com/TarVK/pixi-shadows/blob/master/src/shadows/index.js).
-- Providing casters and overlays: A sprite can be marked to cast shadows (and not be rendered otherwise), by assigning it the group `PIXI.shadows.casterGroup`. Similarly, you can assign a sprite the group `PIXI.shadows.overlayGroup` making it render on top of shadows. By default shadow casters are also used as overlays.
-- Providing shadows/lights: In order to now see anything actually being rendered, shadows must be added to the world. This can be done by instantiating the `PIXI.shadows.Shadow` object.
+- Initialisation: The `PIXI.extensions.add(AppLoaderPlugin);` line will register this plugin to set up your app properly. This does some fairly specific things however, which might not be correct in your usage case. So you can also decide to ignore the step and manually set up your application. Please check out what the init method does in [this file](https://github.com/TarVK/pixi-shadows/blob/master/src/shadows/index.js).
+- Providing casters and overlays: A sprite can be marked to cast shadows (and not be rendered otherwise), by assigning it the group `app.shadows.casterGroup`. Similarly, you can assign a sprite the group `app.shadows.overlayGroup` making it render on top of shadows. By default shadow casters are also used as overlays.
+- Providing shadows/lights: In order to now see anything actually being rendered, shadows must be added to the world. This can be done by instantiating the `Shadow` object.
 
 ### Shadow class
 
 ```js
-var shadow = new PIXI.shadows.Shadow(radius);
+var shadow = new Shadow(radius);
 world.addChild(shadow);
 ```
 
@@ -148,7 +155,7 @@ Attributes:
 ### Filter class
 
 ```js
-var filter = PIXI.shadows.filter;
+var filter = app.shadows.filter;
 ```
 
 Attributes:
