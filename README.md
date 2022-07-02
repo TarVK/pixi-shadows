@@ -1,7 +1,7 @@
 # pixi-shadows
 
 Pixi-shadows allows you to add shadows and lights to your pixi stage.
-The lights themselves are very simple, and this plugin purely focuses on the shadows. If you are interested in high quality lighting, you can easily combine this plugin with the [pixi-lights](https://github.com/pixijs/pixi-lights) plugin. Check out the main demo [here](https://tarvk.github.io/pixi-shadows/build/demos/basic/).
+The lights themselves are very simple, and this plugin purely focuses on the shadows. If you are interested in high quality lighting, you can easily combine this plugin with the [pixi-lights](https://github.com/pixijs/pixi-lights) plugin. Check out the main demo [here](https://tarvk.github.io/pixi-shadows/examples/basic/).
 
 ![Teaser image](https://github.com/TarVK/pixi-shadows/raw/master/teaser.png)
 
@@ -16,110 +16,122 @@ I made it for usage in a personal project, and had to learn how to work with gls
 npm install pixi-shadows
 ```
 
-or copy [the pixi-shadows script](https://github.com/TarVK/pixi-shadows/blob/master/build/shadows/client/pixi-shadows.js) manually for usage without npm.
+or, clone and build this repository, then copy the pixi-shadows [commonjs script](./dist/pixi-shadows.js) or [umd script](./dist/pixi-shadows.umd.js)manually for usage without npm.
+
+## Vanilla JS, UMD build
+
+All pixiJS v6 plugins has special `umd` build suited for vanilla.
+Navigate `pixi-shadows` npm package, take `dist/pixi-shadows.umd.js` file. 
+Also, you can access CDN link, something like `https://cdn.jsdelivr.net/npm/pixi-shadows@latest/dist/pixi-shadows.umd.js`.
+
+```html
+<script src='lib/pixi.js'></script>
+<script src='lib/pixi-shadows.umd.js'></script>
+```
+All classes can then be accessed through `PIXI.shadows` package.
 
 ## Dependencies
 
 Usage dependencies:
 
-- [pixi v6](https://github.com/pixijs/pixi.js/): Tested with version 6.4.2
+- [pixi.js](https://github.com/pixijs/pixi.js/): Tested with version 6.4.2
 - [@pixi/layers](https://github.com/pixijs/layers): Tested with version 1.0.11
 - [pixi-lights](https://github.com/pixijs/pixi-lights): Tested with version 3.0.0
 
-Dev dependencies:
-
-- [node.js](https://nodejs.org/en/)
-- [webpack](https://webpack.js.org/)
-- [webpack-server](https://github.com/webpack/webpack-dev-server)
-- [babel](https://babeljs.io/)
-
 ## Usage
 
-To quickly get going, check out [this example](https://tarvk.github.io/pixi-shadows/build/demos/basic/):
+To quickly get going, check out [this example](https://tarvk.github.io/pixi-shadows/examples/basic/):
 
-```js
-// Import everything, you can of course just use <script> tags on your page as well.
-import * as PIXI from "pixi.js";
-import { AppLoaderPlugin, Shadow } from "pixi-shadows";
-import { applyCanvasMixin } from "@pixi/layers";
+```typescript
+import { AppLoaderPlugin, Shadow } from 'pixi-shadows';
+import { Application, Container, InteractionEvent, SCALE_MODES, Sprite, Texture } from 'pixi.js';
 
 // Initialise the shadows plugin
-PIXI.extensions.add(AppLoaderPlugin);
-applyCanvasMixin(PIXI.CanvasRenderer);
+Application.registerPlugin(AppLoaderPlugin);
 /* The actual demo code: */
 
 // Create your application
-var width = 800;
-var height = 500;
-var app = new PIXI.Application(width, height);
+const width = 800;
+const height = 500;
+const app = new Application({ width, height, autoStart: true });
+
 document.body.appendChild(app.view);
 // AppLoaderPlugin.init.apply(app);
 
 // Create a world container
-var world = app.shadows.container;
+const world = app.shadows.container;
 
 // A function to combine different assets of your world object, but give them a common transform by using pixi-layers
 // It is of course recommended to create a custom class for this, but this demo just shows the minimal steps required
-function createShadowSprite(texture, shadowTexture) {
-  var container = new PIXI.Container(); // This represents your final 'sprite'
+function createShadowSprite(texture: Texture, shadowTexture: Texture) {
+    const container = new Container(); // This represents your final 'sprite'
 
-  // Things that create shadows
-  if (shadowTexture) {
-    var shadowCastingSprite = new PIXI.Sprite(shadowTexture);
-    shadowCastingSprite.parentGroup = app.shadows.casterGroup;
-    container.addChild(shadowCastingSprite);
-  }
+    // Things that create shadows
+    if (shadowTexture) {
+        const shadowCastingSprite = new Sprite(shadowTexture);
 
-  // The things themselves (their texture)
-  var sprite = new PIXI.Sprite(texture);
-  container.addChild(sprite);
+        shadowCastingSprite.parentGroup = app.shadows.casterGroup;
+        container.addChild(shadowCastingSprite);
+    }
 
-  return container;
+    // The things themselves (their texture)
+    const sprite = new Sprite(texture);
+
+    container.addChild(sprite);
+
+    return container;
 }
 
 // Can set ambientLight for the shadow filter, making the shadow less dark:
-// PIXI.shadows.filter.ambientLight = 0.4;
+// shadows.filter.ambientLight = 0.4;
 
 // Create a light that casts shadows
-var shadow = new Shadow(700, 1);
+const shadow = new Shadow(700, 1);
+
 shadow.position.set(450, 150);
 world.addChild(shadow);
 
 // Create a background (that doesn't cast shadows)
-var bgTexture = PIXI.Texture.from("assets/background.jpg");
-var background = new PIXI.Sprite(bgTexture);
+const bgTexture = Texture.from('../../assets/background.jpg');
+const background = new Sprite(bgTexture);
+
 world.addChild(background);
 
 // Create some shadow casting demons
-var demonTexture = PIXI.Texture.from("assets/flameDemon.png");
-demonTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST; //For pixelated scaling
+const demonTexture = Texture.from('../../assets/flameDemon.png');
 
-var demon1 = createShadowSprite(demonTexture, demonTexture);
+demonTexture.baseTexture.scaleMode = SCALE_MODES.NEAREST; // For pixelated scaling
+
+const demon1 = createShadowSprite(demonTexture, demonTexture);
+
 demon1.position.set(100, 100);
 demon1.scale.set(3);
 world.addChild(demon1);
 
-var demon2 = createShadowSprite(demonTexture, demonTexture);
+const demon2 = createShadowSprite(demonTexture, demonTexture);
+
 demon2.position.set(500, 100);
 demon2.scale.set(3);
 world.addChild(demon2);
 
-var demon3 = createShadowSprite(demonTexture, demonTexture);
+const demon3 = createShadowSprite(demonTexture, demonTexture);
+
 demon3.position.set(300, 200);
 demon3.scale.set(3);
 world.addChild(demon3);
 
 // Make the light track your mouse
 world.interactive = true;
-world.on("mousemove", function (event) {
-  shadow.position.copyFrom(event.data.global);
+world.on('mousemove', (event: InteractionEvent) => {
+    shadow.position.copyFrom(event.data.global);
 });
 
 // Create a light point on click
-world.on("pointerdown", function (event) {
-  var shadow = new Shadow(700, 0.7);
-  shadow.position.copyFrom(event.data.global);
-  world.addChild(shadow);
+world.on('pointerdown', (event: InteractionEvent) => {
+    const shadow2 = new Shadow(700, 0.7);
+
+    shadow2.position.copyFrom(event.data.global);
+    world.addChild(shadow);
 });
 ```
 
@@ -127,7 +139,7 @@ world.on("pointerdown", function (event) {
 
 Main steps:
 
-- Initialisation: The `PIXI.extensions.add(AppLoaderPlugin);` line will register this plugin to set up your app properly. This does some fairly specific things however, which might not be correct in your usage case. So you can also decide to ignore the step and manually set up your application. Please check out what the init method does in [this file](https://github.com/TarVK/pixi-shadows/blob/master/src/shadows/index.js).
+- Initialisation: The `Application.registerPlugin(AppLoaderPlugin);` line will register this plugin to set up your app properly. This does some fairly specific things however, which might not be correct in your usage case. So you can also decide to ignore the step and manually set up your application. Please check out what the init method does in [this file](https://github.com/TarVK/pixi-shadows/blob/master/src/shadows/index.ts).
 - Providing casters and overlays: A sprite can be marked to cast shadows (and not be rendered otherwise), by assigning it the group `app.shadows.casterGroup`. Similarly, you can assign a sprite the group `app.shadows.overlayGroup` making it render on top of shadows. By default shadow casters are also used as overlays.
 - Providing shadows/lights: In order to now see anything actually being rendered, shadows must be added to the world. This can be done by instantiating the `Shadow` object.
 
@@ -170,18 +182,18 @@ Attributes:
 ### Usage with pixi-lights
 
 This plugin can easily be used together with pixi-lights. Even more so, some structural choices were specifically made to support pixi-lights as this was the end goal.
-Here you can find a [demo](https://tarvk.github.io/pixi-shadows/build/demos/pixi-lights/) with its corresponding [source code](https://github.com/TarVK/pixi-shadows/blob/master/src/demos/pixi-lights/index.js).
+Here you can find a [demo](https://tarvk.github.io/pixi-shadows/examples/pixi-lights/).
 
 ### Advanced demo
 
-In order to see all things that can be done with pixi-shadows, please have a look at the following [demo](https://tarvk.github.io/pixi-shadows/build/demos/advanced/) and its corresponding [source code](https://github.com/TarVK/pixi-shadows/blob/master/src/demos/advanced/index.js).
+In order to see all things that can be done with pixi-shadows, please have a look at the following [demo](https://tarvk.github.io/pixi-shadows/examples/advanced/).
 This demo can also be used to test performance (which is rather poor), and test how high numbers have to be crancked to achieve a desired effeect.
 
 ## Understanding how pixi-shadows work
 
 As mentioned before, pixi-shadows can most likely be improved in terms of performance. For that reason I think it is important to explain how it currently works, such that more experienced people might be able to give feedback. It might also be handy for people that need to customise the plugin if it doesn't fit their needs exactly.
 
-A [demo](https://tarvk.github.io/pixi-shadows/build/demos/system/) is provided to show various components of the process, as well as its corresponding [source code](https://github.com/TarVK/pixi-shadows/blob/master/src/demos/system/index.js). I attempted to comment [pixi-shadows' source code](https://github.com/TarVK/pixi-shadows/tree/master/src/shadows) a little bit as well, so hopefully this in combination with the explanation below should be enough to understand how it operates. Additionally you can check [this detailed article](https://github.com/mattdesl/lwjgl-basics/wiki/2D-Pixel-Perfect-Shadows) I found (but didn't use directly) that seems to have a very similar approach.
+A [demo](https://tarvk.github.io/pixi-shadows/examples/system/) is provided to show various components of the process. I attempted to comment [pixi-shadows' source code](https://github.com/TarVK/pixi-shadows/tree/master/src/shadows) a little bit as well, so hopefully this in combination with the explanation below should be enough to understand how it operates. Additionally you can check [this detailed article](https://github.com/mattdesl/lwjgl-basics/wiki/2D-Pixel-Perfect-Shadows) I found (but didn't use directly) that seems to have a very similar approach.
 
 Step by step description of what happens for each rendered frame:
 
@@ -197,10 +209,10 @@ Step by step description of what happens for each rendered frame:
 
 ## Demos overview
 
-- [Basic demo](https://tarvk.github.io/pixi-shadows/build/demos/basic/)
-- [Advanced demo](https://tarvk.github.io/pixi-shadows/build/demos/advanced/)
-- [Pixi-lights demo](https://tarvk.github.io/pixi-shadows/build/demos/pixi-lights/)
-- [Process demo](https://tarvk.github.io/pixi-shadows/build/demos/system/)
+- [Basic demo](https://tarvk.github.io/pixi-shadows/examples/basic/)
+- [Advanced demo](https://tarvk.github.io/pixi-shadows/examples/advanced/)
+- [Pixi-lights demo](https://tarvk.github.io/pixi-shadows/examples/pixi-lights/)
+- [Process demo](https://tarvk.github.io/pixi-shadows/examples/system/)
 
 ## Using the development environment
 
@@ -216,36 +228,13 @@ npm install
 ### Running demos (through which you can test the shadows)
 
 ```
-npm run start:[demo name]
+npm run dev
 ```
 
-E.G.
-
-```
-npm run start:basic
-```
-
-This will start a development server that will live update as you save changes to the source code.
+This will start a development server that will live update as you save changes to the source code. you can choose which demo to work on in the main page.
 
 ### Building code
 
-#### Build a specific demo
-
-```
-npm run build-demo:[demo name]
-```
-
-E.G.
-
-```
-npm run build-demo:basic
-```
-
-#### Build all demos
-
-```
-npm run build:demos
-```
 
 #### Build pixi-shadows itself
 

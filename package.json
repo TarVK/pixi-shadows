@@ -1,47 +1,102 @@
 {
-    "name": "pixi-shadows",
-    "version": "0.0.4",
-    "description": "A plugin for PixiJS V4 that allows you to add dymanic shadows to your stage",
-    "namespace": "PIXI.shadows",
-    "main": "build/shadows/node/pixi-shadows.js",
-    "scripts": {
-        "start": "npm run start:pixi-lights",
-        "start:pixi-lights": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack-dev-server --open --config src/demos/pixi-lights/webpack.config.js",
-        "start:basic": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack-dev-server --open --config src/demos/basic/webpack.config.js",
-        "start:advanced": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack-dev-server --open --config src/demos/advanced/webpack.config.js",
-        "start:system": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack-dev-server --open --config src/demos/system/webpack.config.js",
-        "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack",
-        "build:demos": "npm run build-demo:pixi-lights && npm run build-demo:basic && npm run build-demo:advanced && npm run build-demo:system",
-        "build-demo:pixi-lights": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --config src/demos/pixi-lights/webpack.config.js",
-        "build-demo:basic": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --config src/demos/basic/webpack.config.js",
-        "build-demo:advanced": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --config src/demos/advanced/webpack.config.js",
-        "build-demo:system": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --config src/demos/system/webpack.config.js"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/TarVK/pixi-shadows.git"
-    },
-    "author": "Tar van Krieken",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/TarVK/pixi-shadows/issues"
-    },
-    "homepage": "https://github.com/TarVK/pixi-shadows",
-    "peerDependencies": {
-        "pixi.js": "^6.4.2",
-        "@pixi/layers": "^1.0.11",
-        "pixi-lights": "^3.0.0"
-    },
-    "devDependencies": {
-        "babel-cli": "^6.26.0",
-        "babel-loader": "^7.1.5",
-        "babel-preset-env": "^1.7.0",
-        "cross-env": "^7.0.3",
-        "dat.gui": "^0.7.2",
-        "stats-js": "^1.0.0-alpha1",
-        "webpack": "^4.16.2",
-        "webpack-cli": "^3.1.0",
-        "webpack-dev-server": "^3.1.5",
-        "webpack-serve": "^2.0.2"
-    }
+  "name": "pixi-shadows",
+  "version": "0.0.5",
+  "description": "Render top-down field-of-view layers in Pixi.js",
+  "author": "amir-arad <greenshade@gmail.com>",
+  "contributors": [
+    "amir-arad <greenshade@gmail.com>"
+  ],
+  "main": "./dist/pixi-shadows.js",
+  "module": "./lib/pixi-shadows.es.js",
+  "bundle": "./dist/pixi-shadows.umd.js",
+  "namespace": "PIXI.shadows",
+  "types": "./index.d.ts",
+  "homepage": "https://github.com/starwards/pixi-shadows",
+  "bugs": "https://github.com/starwards/pixi-shadows/issues",
+  "license": "MIT",
+  "repository": "git@github.com:starwards/pixi-shadows.git",
+  "scripts": {
+    "clean": "rimraf dist/* lib/* compile",
+    "start": "run-s watch",
+    "watch": "rollup -cw",
+    "prebuild": "run-s clean types",
+    "build": "rollup -c",
+    "postbuild": "run-s build:types",
+    "build:prod": "cross-env NODE_ENV=production run-s build",
+    "prebuild:types": "rimraf compile",
+    "build:types": "tsc --outDir compile && api-extractor run && concat -o index.d.ts ./api-header ./index.d.ts",
+    "lint": "eslint ./src",
+    "types": "tsc -noEmit",
+    "release:patch": "npm version patch && npm publish",
+    "release:minor": "npm version minor && npm publish",
+    "release:major": "npm version major && npm publish",
+    "postversion": "run-s build:prod",
+    "postpublish": "git push && git push --tags",
+    "prepack": "clean-package",
+    "postpack": "clean-package restore",
+    "dev": "vite dev --open /index.html"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=14",
+    "npm": ">=7"
+  },
+  "clean-package": {
+    "indent": 2,
+    "remove": [
+      "clean-package",
+      "scripts",
+      "engines",
+      "devDependencies",
+      "eslintConfig"
+    ]
+  },
+  "files": [
+    "dist/",
+    "lib/",
+    "index.d.ts",
+    "global.d.ts",
+    "LICENSE",
+    "package.json",
+    "README.md"
+  ],
+  "optionalDependencies": {
+    "pixi-lights": "^3.0.0"
+  },
+  "peerDependencies": {
+    "@pixi/app": "^6.4.2",
+    "@pixi/constants": "^6.4.2",
+    "@pixi/core": "^6.4.2",
+    "@pixi/display": "^6.4.2",
+    "@pixi/layers": "^1.0.11",
+    "@pixi/math": "^6.4.2",
+    "@pixi/sprite": "^6.4.2",
+    "@pixi/ticker": "^6.4.2"
+  },
+  "devDependencies": {
+    "@microsoft/api-extractor": "^7.28.2",
+    "@pixi-build-tools/rollup-configurator": "~1.0.11",
+    "@pixi/eslint-config": "^4.0.1",
+    "@types/dat.gui": "^0.7.7",
+    "@typescript-eslint/eslint-plugin": "^4.16.1",
+    "@typescript-eslint/parser": "^4.16.1",
+    "clean-package": "^1.0.1",
+    "concat": "^1.0.3",
+    "cross-env": "^7.0.3",
+    "dat.gui": "^0.7.9",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.1.0",
+    "npm-run-all": "^4.1.5",
+    "pixi.js": "^6.4.2",
+    "prettier": "^2.7.1",
+    "rimraf": "^2.5.3",
+    "rollup": "^2.50.5",
+    "stats-js": "^1.0.1",
+    "tslib": "^2.0.1",
+    "typescript": "^4.3.2",
+    "vite": "^2.9.13"
+  }
 }
