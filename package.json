@@ -1,20 +1,17 @@
 {
   "name": "pixi-shadows",
   "version": "0.0.5",
-  "description": "Render top-down field-of-view layers in Pixi.js",
-  "author": "amir-arad <greenshade@gmail.com>",
-  "contributors": [
-    "amir-arad <greenshade@gmail.com>"
-  ],
+  "description": "A plugin for PixiJS V4 that allows you to add dymanic shadows to your stage", 
+  "author": "Tar van Krieken",
   "main": "./dist/pixi-shadows.js",
   "module": "./lib/pixi-shadows.es.js",
   "bundle": "./dist/pixi-shadows.umd.js",
   "namespace": "PIXI.shadows",
   "types": "./index.d.ts",
-  "homepage": "https://github.com/starwards/pixi-shadows",
-  "bugs": "https://github.com/starwards/pixi-shadows/issues",
+  "homepage": "https://github.com/TarVK/pixi-shadows",
+  "bugs":  "https://github.com/TarVK/pixi-shadows/issues",
   "license": "MIT",
-  "repository": "git@github.com:starwards/pixi-shadows.git",
+  "repository": "git@github.com:TarVK/pixi-shadows.git",
   "scripts": {
     "clean": "rimraf dist/* lib/* compile",
     "start": "run-s watch",
@@ -62,15 +59,13 @@
     "package.json",
     "README.md"
   ],
-  "optionalDependencies": {
-    "pixi-lights": "^3.0.0"
-  },
   "peerDependencies": {
     "@pixi/app": "^6.4.2",
     "@pixi/constants": "^6.4.2",
     "@pixi/core": "^6.4.2",
     "@pixi/display": "^6.4.2",
     "@pixi/layers": "^1.0.11",
+    "pixi-lights": "^3.0.0",
     "@pixi/math": "^6.4.2",
     "@pixi/sprite": "^6.4.2",
     "@pixi/ticker": "^6.4.2"
