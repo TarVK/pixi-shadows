@@ -1,7 +1,7 @@
 {
   "name": "pixi-shadows",
   "version": "0.0.5",
-  "description": "A plugin for PixiJS V4 that allows you to add dymanic shadows to your stage", 
+  "description": "A plugin for PixiJS V6 that allows you to add dymanic shadows to your stage", 
   "author": "Tar van Krieken",
   "main": "./dist/pixi-shadows.js",
   "module": "./lib/pixi-shadows.es.js",
