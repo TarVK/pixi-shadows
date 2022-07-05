@@ -24,15 +24,10 @@ export interface ShadowsOptions {
 export class Shadows {
     // The objects that will cast shadows
     casterGroup = new Group();
-    casterLayer = new Layer(this.casterGroup);
     // The objects that will remain ontop of the shadows
     overlayGroup = new Group();
-    overlayLayer = new Layer(this.overlayGroup);
     filter: ShadowFilter;
     container = new Container();
-    diffuseLayer: Layer | undefined;
-    normalLayer: Layer | undefined;
-    lightLayer: Layer | undefined;
     constructor(app: Application, options?: ShadowsOptions) {
         // // Create the shadow filter
         this.filter = new ShadowFilter(app.renderer.width, app.renderer.height);
@@ -44,14 +39,14 @@ export class Shadows {
 
         if (options?.pixiLights) {
             // Set up pixi-light's layers
-            this.diffuseLayer = new Layer(options.pixiLights.diffuseGroup);
-            this.normalLayer = new Layer(options.pixiLights.normalGroup);
-            this.lightLayer = new Layer(options.pixiLights.lightGroup);
-            const diffuseBlackSprite = new Sprite(this.diffuseLayer.getRenderTexture());
+            const diffuseLayer = new Layer(options.pixiLights.diffuseGroup);
+            const normalLayer = new Layer(options.pixiLights.normalGroup);
+            const lightLayer = new Layer(options.pixiLights.lightGroup);
+            const diffuseBlackSprite = new Sprite(diffuseLayer.getRenderTexture());
 
             diffuseBlackSprite.tint = 0;
             // Set up the lighting layers
-            app.stage.addChild(this.diffuseLayer, diffuseBlackSprite, this.normalLayer, this.lightLayer);
+            app.stage.addChild(diffuseLayer, diffuseBlackSprite, normalLayer, lightLayer);
             // Add the shadow filter to the diffuse layer
             app.stage.filters = [this.filter];
         } else {
