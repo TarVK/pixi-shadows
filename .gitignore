@@ -29,6 +29,5 @@ docs/
 
 # tsc output
 compile
-dist
 lib
 index.d.ts

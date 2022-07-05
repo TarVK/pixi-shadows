@@ -40,7 +40,7 @@ Usage dependencies:
 
 ## Usage
 
-To quickly get going, check out [this example](https://tarvk.github.io/pixi-shadows/examples/basic/):
+To quickly get going, check out [this example](https://tarvk.github.io/pixi-shadows/dist/examples/basic/):
 
 ```typescript
 import { AppLoaderPlugin, Shadow } from 'pixi-shadows';
@@ -182,18 +182,18 @@ Attributes:
 ### Usage with pixi-lights
 
 This plugin can easily be used together with pixi-lights. Even more so, some structural choices were specifically made to support pixi-lights as this was the end goal.
-Here you can find a [demo](https://tarvk.github.io/pixi-shadows/examples/pixi-lights/).
+Here you can find a [demo](https://tarvk.github.io/pixi-shadows/dist/examples/pixi-lights/) with its corresponding [source code](https://tarvk.github.io/pixi-shadows/examples/pixi-lights/index.ts).
 
 ### Advanced demo
 
-In order to see all things that can be done with pixi-shadows, please have a look at the following [demo](https://tarvk.github.io/pixi-shadows/examples/advanced/).
+In order to see all things that can be done with pixi-shadows, please have a look at the following [demo](https://tarvk.github.io/pixi-shadows/dist/examples/advanced/) with its corresponding [source code](https://tarvk.github.io/pixi-shadows/examples/advanced/index.ts).
 This demo can also be used to test performance (which is rather poor), and test how high numbers have to be crancked to achieve a desired effeect.
 
 ## Understanding how pixi-shadows work
 
 As mentioned before, pixi-shadows can most likely be improved in terms of performance. For that reason I think it is important to explain how it currently works, such that more experienced people might be able to give feedback. It might also be handy for people that need to customise the plugin if it doesn't fit their needs exactly.
 
-A [demo](https://tarvk.github.io/pixi-shadows/examples/system/) is provided to show various components of the process. I attempted to comment [pixi-shadows' source code](https://github.com/TarVK/pixi-shadows/tree/master/src/shadows) a little bit as well, so hopefully this in combination with the explanation below should be enough to understand how it operates. Additionally you can check [this detailed article](https://github.com/mattdesl/lwjgl-basics/wiki/2D-Pixel-Perfect-Shadows) I found (but didn't use directly) that seems to have a very similar approach.
+A [demo](https://tarvk.github.io/pixi-shadows/dist/examples/system/) with its corresponding [source code](https://tarvk.github.io/pixi-shadows/examples/system/index.ts) is provided to show various components of the process. I attempted to comment [pixi-shadows' source code](https://github.com/TarVK/pixi-shadows/tree/master/src/shadows) a little bit as well, so hopefully this in combination with the explanation below should be enough to understand how it operates. Additionally you can check [this detailed article](https://github.com/mattdesl/lwjgl-basics/wiki/2D-Pixel-Perfect-Shadows) I found (but didn't use directly) that seems to have a very similar approach.
 
 Step by step description of what happens for each rendered frame:
 
@@ -207,12 +207,9 @@ Step by step description of what happens for each rendered frame:
    4. Render all shadow masks to a single mask texture by adding up all colors.
 3. Use the mask texture in the shadow filter to perform a mask on the container that the filter is added to.
 
-## Demos overview
+## Examples overview
 
-- [Basic demo](https://tarvk.github.io/pixi-shadows/examples/basic/)
-- [Advanced demo](https://tarvk.github.io/pixi-shadows/examples/advanced/)
-- [Pixi-lights demo](https://tarvk.github.io/pixi-shadows/examples/pixi-lights/)
-- [Process demo](https://tarvk.github.io/pixi-shadows/examples/system/)
+- [All Examples](https://tarvk.github.io/pixi-shadows/dist)
 
 ## Using the development environment
 
@@ -225,13 +222,13 @@ Step by step description of what happens for each rendered frame:
 npm install
 ```
 
-### Running demos (through which you can test the shadows)
+### Running examples locally (through which you can test the shadows)
 
 ```
 npm run dev
 ```
 
-This will start a development server that will live update as you save changes to the source code. you can choose which demo to work on in the main page.
+This will start a development server that will live update as you save changes to the source code. you can choose which example to work on in the main page.
 
 ### Building code
 
