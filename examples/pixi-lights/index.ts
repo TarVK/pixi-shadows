@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 
-import { AmbientLight, DirectionalLight, PointLight, diffuseGroup, normalGroup } from 'pixi-lights';
+import { AmbientLight, DirectionalLight, PointLight, diffuseGroup, lightGroup, normalGroup } from 'pixi-lights';
 import { AppLoaderPlugin, Shadow } from '../../src';
 import { Application, Container, InteractionEvent, Texture } from 'pixi.js';
 
@@ -12,11 +12,10 @@ Application.registerPlugin(AppLoaderPlugin);
 // Create your application
 const width = 800;
 const height = 500;
-const app = new PIXI.Application({ width, height });
+const app = new PIXI.Application({ width, height, fov: { pixiLights: { diffuseGroup, lightGroup, normalGroup } } });
 
 document.body.appendChild(app.view);
 
-// Initialise the shadows plugin
 const world = app.shadows.container;
 
 // A function to combine different assets of your world object, but give them a common transform by using pixi-layers

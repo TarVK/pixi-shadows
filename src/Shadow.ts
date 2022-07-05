@@ -44,7 +44,6 @@ export class Shadow extends Sprite {
     _shadowOverlaySprite: Sprite | undefined;
     _shadowMapResultTexture: RenderTexture | undefined;
 
-    private _radialResolution = 800;
     private _shadowMapSprite: Sprite | undefined;
 
     /**
@@ -56,14 +55,15 @@ export class Shadow extends Sprite {
     constructor(
         private _range: number,
         /**
-         * The radius at which the points of the light should be scattered. (Greater range = software shadow).
+         * The opacity of the lit area. (may exceed 1).
          */
         public intensity: number = 1,
         private _pointCount: number = 20,
         /**
-         * The opacity of the lit area. (may exceed 1).
+         * The radius at which the points of the light should be scattered. (Greater range = softer shadow boundary).
          */
-        public scatterRange: number = _pointCount == 1 ? 0 : 15
+        public scatterRange: number = _pointCount === 1 ? 0 : 15,
+        private _radialResolution = 800
     ) {
         super(
             RenderTexture.create({

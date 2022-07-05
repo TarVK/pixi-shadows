@@ -1,5 +1,6 @@
 import { Filter, FilterSystem, RenderTexture } from '@pixi/core';
 
+import { CLEAR_MODES } from '@pixi/constants';
 import { Matrix } from '@pixi/math';
 import { Shadow } from '../Shadow';
 import { filterFuncs } from './FilterFuncs';
@@ -120,7 +121,7 @@ export class ShadowMapFilter extends Filter {
         this.uniforms.dimensions = [shadow.radialResolution, shadow.pointCount];
     }
 
-    apply(filterManager: FilterSystem, input: RenderTexture, output: RenderTexture) {
+    apply(filterManager: FilterSystem, input: RenderTexture, output: RenderTexture, clearMode?: CLEAR_MODES) {
         // Decide whether or not to darken the overlays
         this.uniforms.darkenOverlay = this.shadow.darkenOverlay;
 
@@ -155,6 +156,6 @@ export class ShadowMapFilter extends Filter {
         }
 
         // Apply the filter
-        filterManager.applyFilter(this, input, output);
+        filterManager.applyFilter(this, input, output, clearMode);
     }
 }

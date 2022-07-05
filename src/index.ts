@@ -1,6 +1,5 @@
 import { Application, IApplicationOptions, IApplicationPlugin } from '@pixi/app';
 import { Group, Layer } from '@pixi/layers';
-import { diffuseGroup, lightGroup, normalGroup } from 'pixi-lights';
 
 import { Container } from '@pixi/display';
 import { ShadowFilter } from './filters/ShadowFilter';
@@ -16,7 +15,11 @@ export { augmentContainer } from './mixins/Container';
 export { Shadow } from './Shadow';
 
 export interface ShadowsOptions {
-    useLights: boolean;
+    pixiLights?: {
+        diffuseGroup: Group;
+        normalGroup: Group;
+        lightGroup: Group;
+    };
 }
 export class Shadows {
     // The objects that will cast shadows
@@ -37,18 +40,18 @@ export class Shadows {
         augmentContainer(this.casterGroup, this.overlayGroup, this.filter);
         // Overwrite the application render method
         augmentApplication(app, this.filter);
-        app.stage.addChild(this.container);
         // Set up the shadow layers
         app.stage.addChild(this.casterLayer, this.overlayLayer);
-        if (options?.useLights) {
+        app.stage.addChild(this.container);
+        if (options?.pixiLights) {
             // Set up pixi-light's layers
-            this.diffuseLayer = new Layer(diffuseGroup);
-            this.normalLayer = new Layer(normalGroup);
-            this.lightLayer = new Layer(lightGroup);
+            this.diffuseLayer = new Layer(options.pixiLights.diffuseGroup);
+            this.normalLayer = new Layer(options.pixiLights.normalGroup);
+            this.lightLayer = new Layer(options.pixiLights.lightGroup);
             const diffuseBlackSprite = new Sprite(this.diffuseLayer.getRenderTexture());
 
             diffuseBlackSprite.tint = 0;
-
+            // Set up the lighting layers
             app.stage.addChild(this.diffuseLayer, diffuseBlackSprite, this.normalLayer, this.lightLayer);
             // Add the shadow filter to the diffuse layer
             this.diffuseLayer.filters = [this.filter];

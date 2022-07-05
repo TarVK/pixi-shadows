@@ -1,9 +1,9 @@
+import { CLEAR_MODES, SCALE_MODES } from '@pixi/constants';
 import { Filter, FilterSystem, RenderTexture } from '@pixi/core';
 
 import { Application } from '@pixi/app';
 import { Container } from '@pixi/display';
 import { Matrix } from '@pixi/math';
-import { SCALE_MODES } from '@pixi/constants';
 import { Shadow } from '../Shadow';
 import { Sprite } from '@pixi/sprite';
 
@@ -177,7 +177,7 @@ export class ShadowFilter extends Filter {
     }
 
     //  Apply the filter to a container
-    apply(filterManager: FilterSystem, input: RenderTexture, output: RenderTexture) {
+    apply(filterManager: FilterSystem, input: RenderTexture, output: RenderTexture, clearMode?: CLEAR_MODES) {
         // Filter almost directly taken from the pixi mask filter
         const maskSprite = this._maskResultSprite;
         const tex = this._maskResultSprite.texture;
@@ -194,7 +194,7 @@ export class ShadowFilter extends Filter {
         this.uniforms.mask = tex;
         this.uniforms.otherMatrix = filterManager.calculateSpriteMatrix(this._maskMatrix, maskSprite);
 
-        filterManager.applyFilter(this, input, output);
+        filterManager.applyFilter(this, input, output, clearMode);
     }
 
     // Attribute getters + setters
