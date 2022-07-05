@@ -40,9 +40,8 @@ export class Shadows {
         augmentContainer(this.casterGroup, this.overlayGroup, this.filter);
         // Overwrite the application render method
         augmentApplication(app, this.filter);
-        // Set up the shadow layers
-        app.stage.addChild(this.casterLayer, this.overlayLayer);
         app.stage.addChild(this.container);
+
         if (options?.pixiLights) {
             // Set up pixi-light's layers
             this.diffuseLayer = new Layer(options.pixiLights.diffuseGroup);
@@ -54,7 +53,7 @@ export class Shadows {
             // Set up the lighting layers
             app.stage.addChild(this.diffuseLayer, diffuseBlackSprite, this.normalLayer, this.lightLayer);
             // Add the shadow filter to the diffuse layer
-            this.diffuseLayer.filters = [this.filter];
+            app.stage.filters = [this.filter];
         } else {
             this.container.filters = [this.filter];
         }
