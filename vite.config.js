@@ -9,6 +9,9 @@ export default defineConfig({
         port: 4000,
         strictPort: true,
     },
+    resolve: {
+        alias: { 'pixi-shadows': '../../src' },
+    },
     build: {
         outDir: 'dist',
         emptyOutDir: false,

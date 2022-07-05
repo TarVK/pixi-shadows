@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js';
 
 import { AmbientLight, DirectionalLight, PointLight, diffuseGroup, lightGroup, normalGroup } from 'pixi-lights';
-import { AppLoaderPlugin, Shadow } from '../../src';
+import { AppLoaderPlugin, Shadow } from 'pixi-shadows';
 import { Application, Container, InteractionEvent, Texture } from 'pixi.js';
 
 // Initialise the shadows plugin

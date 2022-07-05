@@ -3,7 +3,7 @@ import './stats.d';
 // Debug/demo imports
 import * as dat from 'dat.gui';
 
-import { AppLoaderPlugin, Shadow } from '../../src';
+import { AppLoaderPlugin, Shadow } from 'pixi-shadows';
 import { Application, Container, InteractionEvent, SCALE_MODES, Sprite, Texture } from 'pixi.js';
 
 import Stats from 'stats-js';

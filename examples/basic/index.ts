@@ -1,4 +1,4 @@
-import { AppLoaderPlugin, Shadow } from '../../src';
+import { AppLoaderPlugin, Shadow } from 'pixi-shadows';
 import { Application, Container, InteractionEvent, SCALE_MODES, Sprite, Texture } from 'pixi.js';
 
 // Initialise the shadows plugin
