@@ -1,0 +1,12 @@
+{
+    "extends": "../tsconfig.json",
+    "include": [
+        "./**/*",
+    ],
+    "compilerOptions": {
+        "paths": {
+            "pixi-shadows": ["../src"]
+          },
+          "types": ["vite/client"]
+    },
+}
