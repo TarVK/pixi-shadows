@@ -6,6 +6,7 @@
     "compilerOptions": {
         "paths": {
             "pixi-shadows": ["../src"]
-          }
-    }
+          },
+          "types": ["vite/client"]
+    },
 }

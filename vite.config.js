@@ -4,7 +4,7 @@ import rollupOptions from './rollup.config';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-    base: '/pixi-shadows/',
+    base: '/pixi-shadows/dist/',
     server: {
         port: 4000,
         strictPort: true,

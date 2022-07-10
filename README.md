@@ -1,9 +1,9 @@
 # pixi-shadows
 
 Pixi-shadows allows you to add shadows and lights to your pixi stage.
-The lights themselves are very simple, and this plugin purely focuses on the shadows. If you are interested in high quality lighting, you can easily combine this plugin with the [pixi-lights](https://github.com/pixijs/pixi-lights) plugin. Check out the main demo [here](https://tarvk.github.io/pixi-shadows/examples/basic/).
+The lights themselves are very simple, and this plugin purely focuses on the shadows. If you are interested in high quality lighting, you can easily combine this plugin with the [pixi-lights](https://github.com/pixijs/pixi-lights) plugin. Check out the main demo [here](https://tarvk.github.io/pixi-shadows/dist/examples/basic/index.html).
 
-![Teaser image](https://github.com/TarVK/pixi-shadows/raw/master/teaser.png)
+![Teaser image](./teaser.png)
 
 ## Disclaimer
 

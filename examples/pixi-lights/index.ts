@@ -4,6 +4,11 @@ import { AmbientLight, DirectionalLight, PointLight, diffuseGroup, lightGroup, n
 import { AppLoaderPlugin, Shadow } from 'pixi-shadows';
 import { Application, Container, InteractionEvent, Texture } from 'pixi.js';
 
+import backgroundNormalMapUrl from '../../assets/backgroundNormalMap.jpg';
+import backgroundUrl from '../../assets/background.jpg';
+import cutBlockNormalMapUrl from '../../assets/cutBlockNormalMap.png';
+import cutBlockUrl from '../../assets/cutBlock.png';
+
 // Initialise the shadows plugin
 Application.registerPlugin(AppLoaderPlugin);
 
@@ -72,15 +77,15 @@ light.position.set(300, 300);
 world.addChild(light);
 
 // Create a background (that doesn't cast shadows)
-const bgDiffuseTexture = PIXI.Texture.from('../../assets/background.jpg');
-const bgNormalTexture = PIXI.Texture.from('../../assets/backgroundNormalMap.jpg');
+const bgDiffuseTexture = PIXI.Texture.from(backgroundUrl);
+const bgNormalTexture = PIXI.Texture.from(backgroundNormalMapUrl);
 const background = create3DSprite(bgDiffuseTexture, bgNormalTexture);
 
 world.addChild(background);
 
 // Create some shadow casting blocks
-const blockDiffuse = PIXI.Texture.from('../../assets/cutBlock.png');
-const blockNormal = PIXI.Texture.from('../../assets/cutBlockNormalMap.png');
+const blockDiffuse = PIXI.Texture.from(cutBlockUrl);
+const blockNormal = PIXI.Texture.from(cutBlockNormalMapUrl);
 
 const block1 = create3DSprite(blockDiffuse, blockNormal, blockDiffuse);
 

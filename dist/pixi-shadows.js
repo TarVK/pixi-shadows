@@ -2,7 +2,7 @@
  
 /*!
  * pixi-shadows - v0.0.5
- * Compiled Tue, 05 Jul 2022 21:45:25 UTC
+ * Compiled Sun, 10 Jul 2022 10:35:11 UTC
  *
  * pixi-shadows is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license

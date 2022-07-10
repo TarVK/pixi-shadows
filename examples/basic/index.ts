@@ -1,6 +1,9 @@
 import { AppLoaderPlugin, Shadow } from 'pixi-shadows';
 import { Application, Container, InteractionEvent, SCALE_MODES, Sprite, Texture } from 'pixi.js';
 
+import backgroundUrl from '../../assets/background.jpg';
+import flameDemonUrl from '../../assets/flameDemon.png';
+
 // Initialise the shadows plugin
 Application.registerPlugin(AppLoaderPlugin);
 /* The actual demo code: */
@@ -47,13 +50,13 @@ shadow.position.set(450, 150);
 world.addChild(shadow);
 
 // Create a background (that doesn't cast shadows)
-const bgTexture = Texture.from('../../assets/background.jpg');
+const bgTexture = Texture.from(backgroundUrl);
 const background = new Sprite(bgTexture);
 
 world.addChild(background);
 
 // Create some shadow casting demons
-const demonTexture = Texture.from('../../assets/flameDemon.png');
+const demonTexture = Texture.from(flameDemonUrl);
 
 demonTexture.baseTexture.scaleMode = SCALE_MODES.NEAREST; // For pixelated scaling
 
