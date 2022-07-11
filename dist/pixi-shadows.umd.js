@@ -1,8 +1,8 @@
 /* eslint-disable */
  
 /*!
- * pixi-shadows - v0.0.5
- * Compiled Sun, 10 Jul 2022 10:35:11 UTC
+ * pixi-shadows - v1.0.0
+ * Compiled Mon, 11 Jul 2022 09:37:28 UTC
  *
  * pixi-shadows is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
