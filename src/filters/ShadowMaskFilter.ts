@@ -52,6 +52,7 @@ export class ShadowMaskFilter extends Filter {
             uniform float lightRange;
             uniform float lightScatterRange;
             uniform float lightIntensity;
+            uniform float fallOffFraction;
 
             ${filterFuncs}
             
@@ -91,17 +92,21 @@ export class ShadowMaskFilter extends Filter {
                     float objectDistance = colorToFloat(depthPixel) / 100000.0 * lightRange;
                     
                     // Calculate the intensity of this pixel based on the overlaySampler and objectDistance
+                    float distFromEdge = lightRange - distance;
+                    float fallOffDist = lightRange * fallOffFraction;
+                    float defaultIntensity = min(1.0, distFromEdge/fallOffDist);
+
+
                     float intensity = 0.0;
-                    if(darkenOverlay){
-                        if(objectDistance > pointDistance || objectDistance >= lightRange){
-                            intensity = 1.0 - distance / lightRange;
-                        }else if(overlayPixel.a > 0.5){
-                            intensity = 1.0 - distance / lightRange;
-                            intensity *= pow(1.0 - (distance - objectDistance) / (lightRange - objectDistance), 2.5) * overlayPixel.a;
+                    if (darkenOverlay) {
+                        if (objectDistance > pointDistance || objectDistance >= lightRange) {
+                            intensity = defaultIntensity;
+                        }else if (overlayPixel.a > 0.5) {
+                            intensity = defaultIntensity * pow(1.0 - (distance - objectDistance) / (lightRange - objectDistance), 2.5) * overlayPixel.a;
                         }
-                    }else{
-                        if(inverted){
-                            if(overlayPixel.a > 0.5){
+                    } else {
+                        if (inverted) {
+                            if (overlayPixel.a > 0.5) {
                                 intensity = 1.0-overlayPixel.a;
                             }else if (objectDistance > pointDistance || objectDistance >= lightRange) {
                                 intensity = 0.0;
@@ -110,9 +115,9 @@ export class ShadowMaskFilter extends Filter {
                             }
                         }else{
                             if (objectDistance > pointDistance || objectDistance >= lightRange) {
-                                intensity = 1.0 - distance / lightRange;
+                                intensity = defaultIntensity;
                             }else if (overlayPixel.a > 0.5) {
-                                intensity = (1.0 - distance / lightRange) * (1.0 - (pointDistance - objectDistance) / overlayLightLength);
+                                intensity = defaultIntensity * (1.0 - (pointDistance - objectDistance) / overlayLightLength);
                             }
                         }
                     }
@@ -133,7 +138,8 @@ export class ShadowMaskFilter extends Filter {
     }
 
     apply(filterManager: FilterSystem, input: RenderTexture, output: RenderTexture, clearMode?: CLEAR_MODES) {
-        // Decide whether or not to darken the overlays
+        // Update simple uniforms
+        this.uniforms.fallOffFraction = this.shadow.fallOffFraction;
         this.uniforms.darkenOverlay = this.shadow.darkenOverlay;
 
         // Attach the object sampler
