@@ -1,7 +1,7 @@
 {
   "name": "pixi-shadows",
-  "version": "0.0.5",
-  "description": "A plugin for PixiJS V6 that allows you to add dymanic shadows to your stage", 
+  "version": "1.0.0",
+  "description": "A plugin for PixiJS V6 that allows you to add dymanic shadows to your stage",
   "author": "Tar van Krieken",
   "main": "./dist/pixi-shadows.js",
   "module": "./lib/pixi-shadows.es.js",
@@ -9,7 +9,7 @@
   "namespace": "PIXI.shadows",
   "types": "./index.d.ts",
   "homepage": "https://github.com/TarVK/pixi-shadows",
-  "bugs":  "https://github.com/TarVK/pixi-shadows/issues",
+  "bugs": "https://github.com/TarVK/pixi-shadows/issues",
   "license": "MIT",
   "repository": "git@github.com:TarVK/pixi-shadows.git",
   "scripts": {
