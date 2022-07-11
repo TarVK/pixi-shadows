@@ -12,31 +12,34 @@ I made it for usage in a personal project, and had to learn how to work with gls
 
 ## Installation
 
+When using this plugin, you have to make sure the following dependencies are present:
+
+-   [pixi.js](https://github.com/pixijs/pixi.js/): Tested with version 6.4.2
+-   [@pixi/layers](https://github.com/pixijs/layers): Tested with version 1.0.11
+-   [pixi-lights](https://github.com/pixijs/pixi-lights) (optional): Tested with version 3.0.0
+
+Next your can either perform an npm install, or manually import the source file.
+
+### Npm
+
 ```
 npm install pixi-shadows
 ```
 
 or, clone and build this repository, then copy the pixi-shadows [commonjs script](./dist/pixi-shadows.js) or [umd script](./dist/pixi-shadows.umd.js)manually for usage without npm.
 
-## Vanilla JS, UMD build
+### Vanilla JS, UMD build
 
 All pixiJS v6 plugins has special `umd` build suited for vanilla.
-Navigate `pixi-shadows` npm package, take `dist/pixi-shadows.umd.js` file. 
+Navigate `pixi-shadows` npm package, take `dist/pixi-shadows.umd.js` file.
 Also, you can access CDN link, something like `https://cdn.jsdelivr.net/npm/pixi-shadows@latest/dist/pixi-shadows.umd.js`.
 
 ```html
-<script src='lib/pixi.js'></script>
-<script src='lib/pixi-shadows.umd.js'></script>
+<script src="lib/pixi.js"></script>
+<script src="lib/pixi-shadows.umd.js"></script>
 ```
+
 All classes can then be accessed through `PIXI.shadows` package.
-
-## Dependencies
-
-Usage dependencies:
-
-- [pixi.js](https://github.com/pixijs/pixi.js/): Tested with version 6.4.2
-- [@pixi/layers](https://github.com/pixijs/layers): Tested with version 1.0.11
-- [pixi-lights](https://github.com/pixijs/pixi-lights): Tested with version 3.0.0
 
 ## Usage
 
@@ -139,9 +142,9 @@ world.on('pointerdown', (event: InteractionEvent) => {
 
 Main steps:
 
-- Initialisation: The `Application.registerPlugin(AppLoaderPlugin);` line will register this plugin to set up your app properly. This does some fairly specific things however, which might not be correct in your usage case. So you can also decide to ignore the step and manually set up your application. Please check out what the init method does in [this file](https://github.com/TarVK/pixi-shadows/blob/master/src/shadows/index.ts).
-- Providing casters and overlays: A sprite can be marked to cast shadows (and not be rendered otherwise), by assigning it the group `app.shadows.casterGroup`. Similarly, you can assign a sprite the group `app.shadows.overlayGroup` making it render on top of shadows. By default shadow casters are also used as overlays.
-- Providing shadows/lights: In order to now see anything actually being rendered, shadows must be added to the world. This can be done by instantiating the `Shadow` object.
+-   Initialisation: The `Application.registerPlugin(AppLoaderPlugin);` line will register this plugin to set up your app properly. This does some fairly specific things however, which might not be correct in your usage case. So you can also decide to ignore the step and manually set up your application. Please check out what the init method does in [this file](https://github.com/TarVK/pixi-shadows/blob/master/src/shadows/index.ts).
+-   Providing casters and overlays: A sprite can be marked to cast shadows (and not be rendered otherwise), by assigning it the group `app.shadows.casterGroup`. Similarly, you can assign a sprite the group `app.shadows.overlayGroup` making it render on top of shadows. By default shadow casters are also used as overlays.
+-   Providing shadows/lights: In order to now see anything actually being rendered, shadows must be added to the world. This can be done by instantiating the `Shadow` object.
 
 ### Shadow class
 
@@ -152,17 +155,17 @@ world.addChild(shadow);
 
 Parameters:
 
-- range: The radius of the lit area
-- intensity: The opacity of the lit area
-- pointCount: The number of points that cast light rays (With more points you get softer edges)
-- scatterRange: The radius in which the light points are spread around
+-   range: The radius of the lit area
+-   intensity: The opacity of the lit area
+-   pointCount: The number of points that cast light rays (With more points you get softer edges)
+-   scatterRange: The radius in which the light points are spread around
 
 Attributes:
 
-- All of the parameters above are also attributes
-- radialResolution: The number of pixels to use for the shadow mapping, preferably at least 2 times the radius
-- depthResolution: The number of depth steps to execute per pixel, preferably at least 1
-- ignoreShadowCaster: A sprite that can be assigned to a light such that it won't cast shadows
+-   All of the parameters above are also attributes
+-   radialResolution: The number of pixels to use for the shadow mapping, preferably at least 2 times the radius
+-   depthResolution: The number of depth steps to execute per pixel, preferably at least 1
+-   ignoreShadowCaster: A sprite that can be assigned to a light such that it won't cast shadows
 
 ### Filter class
 
@@ -172,10 +175,10 @@ var filter = app.shadows.filter;
 
 Attributes:
 
-- width: The width of your application
-- height: The height of your application
-- useShadowCasterAsOverlay: Whether or not to simply use the sprites casting shadows as the overlays for the shadows (true by default)
-- ambientLight: The opacity of the world where no shadows are present (the brightness of the shadows)
+-   width: The width of your application
+-   height: The height of your application
+-   useShadowCasterAsOverlay: Whether or not to simply use the sprites casting shadows as the overlays for the shadows (true by default)
+-   ambientLight: The opacity of the world where no shadows are present (the brightness of the shadows)
 
 ---
 
@@ -199,24 +202,20 @@ Step by step description of what happens for each rendered frame:
 
 1. Calculate transforms in the scene: As per usual, world transforms for all objects are calculated. But the Container mixin does one more thing during this step; it registers all special sprites and adds them to the shadow filter.
 2. Update the shadow filter which will perform several steps of its own:
-   1. Render all shadow casters to a single texture.
-   2. Render all shadow overlays to a signle texture.
-   3. Render all shadows to their own texture:
-      1. A shadow will first create a shadow map, as can be seen in the demo. This is a texture that stores the data of how far away a ray can be sent before it hits an object. To create this texture, it uses the shadow caster texture to look up pixel opacities. This texture can have several rows and columns, where every column indicates a certain angle, and every row indicates a single light point. The light points are spread around the center of the origin at a distance of the provided scatter range.
-      2. Using this shadow map, a shadow can create a mask texture. For every pixel in the texture it will go through all light points. For all light points it will look up its angle towards said point, and check the distance to an object by checking the shadow map. If this distane is smaller than its own distance to the light point, it means the pixel is in the dark and should be black. In addition, every pixel will check the overlay texture. If it is opaque in said texture, it should be opaque in the mask, even if it is in a shadow.
-   4. Render all shadow masks to a single mask texture by adding up all colors.
+    1. Render all shadow casters to a single texture.
+    2. Render all shadow overlays to a signle texture.
+    3. Render all shadows to their own texture:
+        1. A shadow will first create a shadow map, as can be seen in the demo. This is a texture that stores the data of how far away a ray can be sent before it hits an object. To create this texture, it uses the shadow caster texture to look up pixel opacities. This texture can have several rows and columns, where every column indicates a certain angle, and every row indicates a single light point. The light points are spread around the center of the origin at a distance of the provided scatter range.
+        2. Using this shadow map, a shadow can create a mask texture. For every pixel in the texture it will go through all light points. For all light points it will look up its angle towards said point, and check the distance to an object by checking the shadow map. If this distane is smaller than its own distance to the light point, it means the pixel is in the dark and should be black. In addition, every pixel will check the overlay texture. If it is opaque in said texture, it should be opaque in the mask, even if it is in a shadow.
+    4. Render all shadow masks to a single mask texture by adding up all colors.
 3. Use the mask texture in the shadow filter to perform a mask on the container that the filter is added to.
-
-## Examples overview
-
-- [All Examples](https://tarvk.github.io/pixi-shadows/dist)
 
 ## Using the development environment
 
 ### Setup
 
-- Install [node.js](https://nodejs.org/en/)
-- Run the following command in the root of the project
+-   Install [node.js](https://nodejs.org/en/)
+-   Run the following command in the root of the project
 
 ```
 npm install
@@ -232,7 +231,6 @@ This will start a development server that will live update as you save changes t
 
 ### Building code
 
-
 #### Build pixi-shadows itself
 
 ```
@@ -241,7 +239,7 @@ npm run build
 
 ## TODO
 
-- Add more shadow types
-  - spotlight shadow
-  - directional shadow
-- Improve performance
+-   Add more shadow types
+    -   spotlight shadow
+    -   directional shadow
+-   Improve performance
