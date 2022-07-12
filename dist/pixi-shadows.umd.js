@@ -1,8 +1,8 @@
 /* eslint-disable */
  
 /*!
- * pixi-shadows - v1.0.0
- * Compiled Mon, 11 Jul 2022 09:37:28 UTC
+ * pixi-shadows - v1.1.0
+ * Compiled Tue, 12 Jul 2022 21:19:40 UTC
  *
  * pixi-shadows is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -235,6 +235,7 @@ vec4 floatToColor(float f){
             uniform float lightRange;
             uniform float lightScatterRange;
             uniform float lightIntensity;
+            uniform float fallOffFraction;
 
             ${filterFuncs}
             
@@ -274,17 +275,21 @@ vec4 floatToColor(float f){
                     float objectDistance = colorToFloat(depthPixel) / 100000.0 * lightRange;
                     
                     // Calculate the intensity of this pixel based on the overlaySampler and objectDistance
+                    float distFromEdge = lightRange - distance;
+                    float fallOffDist = lightRange * fallOffFraction;
+                    float defaultIntensity = min(1.0, distFromEdge/fallOffDist);
+
+
                     float intensity = 0.0;
-                    if(darkenOverlay){
-                        if(objectDistance > pointDistance || objectDistance >= lightRange){
-                            intensity = 1.0 - distance / lightRange;
-                        }else if(overlayPixel.a > 0.5){
-                            intensity = 1.0 - distance / lightRange;
-                            intensity *= pow(1.0 - (distance - objectDistance) / (lightRange - objectDistance), 2.5) * overlayPixel.a;
+                    if (darkenOverlay) {
+                        if (objectDistance > pointDistance || objectDistance >= lightRange) {
+                            intensity = defaultIntensity;
+                        }else if (overlayPixel.a > 0.5) {
+                            intensity = defaultIntensity * pow(1.0 - (distance - objectDistance) / (lightRange - objectDistance), 2.5) * overlayPixel.a;
                         }
-                    }else{
-                        if(inverted){
-                            if(overlayPixel.a > 0.5){
+                    } else {
+                        if (inverted) {
+                            if (overlayPixel.a > 0.5) {
                                 intensity = 1.0-overlayPixel.a;
                             }else if (objectDistance > pointDistance || objectDistance >= lightRange) {
                                 intensity = 0.0;
@@ -293,9 +298,9 @@ vec4 floatToColor(float f){
                             }
                         }else{
                             if (objectDistance > pointDistance || objectDistance >= lightRange) {
-                                intensity = 1.0 - distance / lightRange;
+                                intensity = defaultIntensity;
                             }else if (overlayPixel.a > 0.5) {
-                                intensity = (1.0 - distance / lightRange) * (1.0 - (pointDistance - objectDistance) / overlayLightLength);
+                                intensity = defaultIntensity * (1.0 - (pointDistance - objectDistance) / overlayLightLength);
                             }
                         }
                     }
@@ -316,7 +321,8 @@ vec4 floatToColor(float f){
         }
 
         apply(filterManager, input, output, clearMode) {
-            // Decide whether or not to darken the overlays
+            // Update simple uniforms
+            this.uniforms.fallOffFraction = this.shadow.fallOffFraction;
             this.uniforms.darkenOverlay = this.shadow.darkenOverlay;
 
             // Attach the object sampler
@@ -384,6 +390,11 @@ vec4 floatToColor(float f){
          */
         
 
+        /**
+         * The fraction of the range over which the light will fall-off linearly
+         */
+        __init4() {this.fallOffFraction = 1.0;}
+
         
         
         
@@ -418,7 +429,7 @@ vec4 floatToColor(float f){
                     width: _range * 2,
                     height: _range * 2,
                 })
-            );this._range = _range;this.intensity = intensity;this._pointCount = _pointCount;this.scatterRange = scatterRange;this._radialResolution = _radialResolution;Shadow.prototype.__init.call(this);Shadow.prototype.__init2.call(this);Shadow.prototype.__init3.call(this);;
+            );this._range = _range;this.intensity = intensity;this._pointCount = _pointCount;this.scatterRange = scatterRange;this._radialResolution = _radialResolution;Shadow.prototype.__init.call(this);Shadow.prototype.__init2.call(this);Shadow.prototype.__init3.call(this);Shadow.prototype.__init4.call(this);;
 
             this.anchor.set(0.5);
 
