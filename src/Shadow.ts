@@ -36,6 +36,11 @@ export class Shadow extends Sprite {
      */
     ignoreShadowCaster: Sprite | undefined;
 
+    /**
+     * The fraction of the range over which the light will fall-off linearly
+     */
+    fallOffFraction = 1.0;
+
     shadowFilter: ShadowMaskFilter;
     renderStep: boolean | undefined;
     shadowMapResultSprite: Sprite | undefined;

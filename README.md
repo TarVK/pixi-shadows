@@ -166,6 +166,7 @@ Attributes:
 -   radialResolution: The number of pixels to use for the shadow mapping, preferably at least 2 times the radius
 -   depthResolution: The number of depth steps to execute per pixel, preferably at least 1
 -   ignoreShadowCaster: A sprite that can be assigned to a light such that it won't cast shadows
+-   fallOffFraction: The fraction (between 0 and 1) of the light range over which the intensity should linearly fall-off. Defaults to 1, setting this to 0 results in hard edges at the end of the light's range
 
 ### Filter class
 
