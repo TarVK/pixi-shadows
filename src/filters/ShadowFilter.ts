@@ -1,9 +1,7 @@
-import { CLEAR_MODES, SCALE_MODES } from '@pixi/constants';
-import { Filter, FilterSystem, RenderTexture } from '@pixi/core';
+import { Filter, FilterSystem, Matrix, RenderTexture, SCALE_MODES, CLEAR_MODES } from '@pixi/core';
 
 import { Application } from '@pixi/app';
 import { Container } from '@pixi/display';
-import { Matrix } from '@pixi/math';
 import { Shadow } from '../Shadow';
 import { Sprite } from '@pixi/sprite';
 

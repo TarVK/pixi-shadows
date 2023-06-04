@@ -1,7 +1,5 @@
-import { Filter, FilterSystem, RenderTexture } from '@pixi/core';
+import { Filter, FilterSystem, RenderTexture, Matrix, CLEAR_MODES } from '@pixi/core';
 
-import { CLEAR_MODES } from '@pixi/constants';
-import { Matrix } from '@pixi/math';
 import { Shadow } from '../Shadow';
 import { filterFuncs } from './FilterFuncs';
 
