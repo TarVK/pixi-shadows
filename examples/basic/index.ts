@@ -1,11 +1,11 @@
-import { AppLoaderPlugin, Shadow } from 'pixi-shadows';
-import { Application, Container, InteractionEvent, SCALE_MODES, Sprite, Texture } from 'pixi.js';
+import { ShadowsPlugin, Shadow, Shadows } from 'pixi-shadows';
+import { extensions, Application, Container, SCALE_MODES, Sprite, Texture } from 'pixi.js';
 
 import backgroundUrl from '../../assets/background.jpg';
 import flameDemonUrl from '../../assets/flameDemon.png';
 
 // Initialise the shadows plugin
-Application.registerPlugin(AppLoaderPlugin);
+extensions.add(ShadowsPlugin)
 /* The actual demo code: */
 
 // Create your application

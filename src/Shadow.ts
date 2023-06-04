@@ -1,7 +1,5 @@
-import { BLEND_MODES, SCALE_MODES } from '@pixi/constants';
-
 import { Application } from '@pixi/app';
-import { RenderTexture } from '@pixi/core';
+import { BLEND_MODES, RenderTexture, SCALE_MODES } from '@pixi/core';
 import { ShadowMapFilter } from './filters/ShadowMapFilter';
 import { ShadowMaskFilter } from './filters/ShadowMaskFilter';
 import { Sprite } from '@pixi/sprite';

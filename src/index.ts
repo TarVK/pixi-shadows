@@ -7,6 +7,9 @@ import { Sprite } from '@pixi/sprite';
 import { augmentApplication } from './mixins/Application';
 import { augmentContainer } from './mixins/Container';
 
+import type { ExtensionMetadata } from '@pixi/extensions';
+import { ExtensionType } from '@pixi/extensions';
+
 export { filterFuncs } from './filters/FilterFuncs';
 export { ShadowFilter } from './filters/ShadowFilter';
 export { ShadowMaskFilter } from './filters/ShadowMaskFilter';
@@ -71,3 +74,45 @@ export const AppLoaderPlugin: IApplicationPlugin = {
         delete this.shadows;
     },
 };
+
+/**
+ * Middleware for for Application Shadows.
+ * @example
+ * import {ShadowsPlugin} from 'pixi-shadows';
+ * import {Application} from '@pixi/app';
+ * import {extensions} from '@pixi/extensions';
+ * extensions.add(ShadowsPlugin);
+ * @class
+ * @memberof PIXI
+ */
+export class ShadowsPlugin
+{
+    /** @ignore */
+    static extension: ExtensionMetadata = ExtensionType.Application;
+
+    static shadows: Shadows;
+
+    /**
+     * Initialize the plugin with scope of application instance
+     * @static
+     * @private
+     * @param {object} [options] - See application options
+     */
+    static init(options?: GlobalMixins.IApplicationOptions): void
+    {
+        this.shadows = new Shadows(this as any, options as any);
+    }
+
+    /**
+     * Clean up the ticker, scoped to application.
+     * @static
+     * @private
+     */
+    static destroy(): void
+    {
+        if (this.shadows)
+        {
+            delete this.shadows ;
+        }
+    }
+}

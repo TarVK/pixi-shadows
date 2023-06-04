@@ -3,8 +3,8 @@ import './stats.d';
 // Debug/demo imports
 import * as dat from 'dat.gui';
 
-import { AppLoaderPlugin, Shadow } from 'pixi-shadows';
-import { Application, Container, InteractionEvent, SCALE_MODES, Sprite, Texture } from 'pixi.js';
+import { ShadowsPlugin, Shadow } from 'pixi-shadows';
+import { Application, extensions, Container, FederatedMouseEvent, SCALE_MODES, Sprite, Texture } from 'pixi.js';
 
 import Stats from 'stats-js';
 import backgroundUrl from '../../assets/background.jpg';
@@ -13,8 +13,7 @@ import flameDemonShadowUrl from '../../assets/flameDemonShadow.png';
 import flameDemonUrl from '../../assets/flameDemon.png';
 
 // Initialise the shadows plugin
-Application.registerPlugin(AppLoaderPlugin);
-
+extensions.add(ShadowsPlugin)
 /* The actual demo code: */
 
 // Some general settings for the demo
@@ -109,7 +108,7 @@ world.addChild(demon3);
 
 // Make the light track your mouse
 world.interactive = true;
-world.on('mousemove', (event: InteractionEvent) => {
+world.on('mousemove', (event: FederatedMouseEvent) => {
     if (demoOptions.followMouse) {
         shadow.position.copyFrom(event.data.global);
     } else {
@@ -121,7 +120,7 @@ world.on('mousemove', (event: InteractionEvent) => {
 // Create a light point on click
 const shadows: Shadow[] = [];
 
-world.on('pointerdown', (event: InteractionEvent) => {
+world.on('pointerdown', (event: FederatedMouseEvent) => {
     const shadow2 = new Shadow(700, 0.7);
 
     shadows.push(shadow2);

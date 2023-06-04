@@ -3,14 +3,14 @@ import './stats.d';
 // Debug/demo imports
 import * as dat from 'dat.gui';
 
-import { AppLoaderPlugin, Shadow } from 'pixi-shadows';
-import { Application, Container, InteractionEvent, SCALE_MODES, Sprite, Texture } from 'pixi.js';
+import { ShadowsPlugin, Shadow, Shadows } from 'pixi-shadows';
+import { Application, extensions, Container, FederatedMouseEvent, SCALE_MODES, Sprite, Texture } from 'pixi.js';
 
 import backgroundUrl from '../../assets/background.jpg';
 import flameDemonUrl from '../../assets/flameDemon.png';
 
 // Initialise the shadows plugin
-Application.registerPlugin(AppLoaderPlugin);
+extensions.add(ShadowsPlugin)
 /* The actual demo code: */
 
 // Some general settings for the demo
@@ -24,6 +24,7 @@ const demoOptions = {
 const width = 800;
 const height = 700;
 const app = new Application({ width, height });
+app.shadows = new Shadows(app)
 
 document.body.appendChild(app.view);
 
@@ -113,7 +114,7 @@ showShadowMap();
 
 // Make the light track your mouse
 world.interactive = true;
-world.on('mousemove', (event: InteractionEvent) => {
+world.on('mousemove', (event: FederatedMouseEvent) => {
     if (demoOptions.followMouse) {
         shadow.position.copyFrom(event.data.global);
     } else {
